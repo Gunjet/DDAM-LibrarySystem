@@ -1,820 +1,1047 @@
 import { useMemo, useState } from "react";
-import type { CSSProperties, ReactElement } from "react";
 
-type Page = "home" | "search" | "my-documents" | "projects" | "settings" | "space";
-
-type IconName =
-  | "book"
+type Page =
   | "home"
+  | "projects"
+  | "rnd"
+  | "people"
+  | "prompts"
   | "search"
-  | "file"
-  | "briefcase"
-  | "settings"
-  | "menu"
-  | "dots"
-  | "microscope"
-  | "chip"
-  | "wrench"
-  | "box"
-  | "chart"
-  | "users"
-  | "external"
-  | "share"
-  | "download"
-  | "close";
+  | "settings";
+type ProjectStatus = "Planning" | "Ongoing" | "Done";
+type ResearchStatus = "Testing" | "Validated" | "Draft" | "Archived";
 
-type Space = {
-  id: string;
-  name: string;
-  desc: string;
-  docs: number;
-  color: string;
-  tint: string;
-  icon: IconName;
-};
-
-type DocumentItem = {
+type Member = {
   id: number;
-  title: string;
-  space: string;
-  summary: string;
-  type: string;
-  status: string;
-  project: string;
-  updated: string;
-  contributors: string[];
-  icon: IconName;
-  tint: string;
-  iconColor: string;
-  mine: boolean;
+  name: string;
+  initials: string;
+  role: string;
+  skills: string[];
+  projects: string[];
+  email: string;
+  color: string;
 };
 
 type Project = {
   id: number;
   name: string;
-  space: string;
-  members: number;
-  docs: number;
-  status: "Active" | "Draft";
-  chips: string[];
+  client: string;
+  status: ProjectStatus;
+  progress: number;
+  members: string[];
+  techStack: string[];
+  description: string;
+  goal: string;
+  problemSolved: string;
+  timeline: string;
+  files: FileAsset[];
+  screenshots: string[];
+  lessons: string[];
+  tasks: Task[];
 };
 
-const spaces: Space[] = [
-  {
-    id: "rd",
-    name: "R&D",
-    desc: "Research, experiments, findings",
-    docs: 142,
-    color: "#3b82f6",
-    tint: "#eff6ff",
-    icon: "microscope",
-  },
-  {
-    id: "platform",
-    name: "Platform",
-    desc: "Infrastructure, architecture",
-    docs: 87,
-    color: "#a855f7",
-    tint: "#faf5ff",
-    icon: "chip",
-  },
-  {
-    id: "service",
-    name: "Service",
-    desc: "Service models, runbooks",
-    docs: 64,
-    color: "#22c55e",
-    tint: "#f0fdf4",
-    icon: "wrench",
-  },
-  {
-    id: "product",
-    name: "Product",
-    desc: "Specs, roadmaps, decisions",
-    docs: 51,
-    color: "#fb923c",
-    tint: "#fff7ed",
-    icon: "box",
-  },
-  {
-    id: "operations",
-    name: "Operations",
-    desc: "Processes, SOPs, runbooks",
-    docs: 33,
-    color: "#f87171",
-    tint: "#fff1f2",
-    icon: "chart",
-  },
-];
+type Task = {
+  title: string;
+  assignee: string;
+  status: "Done" | "In Progress" | "Urgent" | "Backlog";
+};
 
-const documents: DocumentItem[] = [
+type FileAsset = {
+  name: string;
+  type: "XL" | "PP" | "WD" | "PDF" | "FIG" | "LINK";
+  size: string;
+  owner: string;
+};
+
+type ResearchItem = {
+  id: number;
+  title: string;
+  type: "AI Model" | "Service Model" | "Experiment" | "Research Note";
+  status: ResearchStatus;
+  owner: string;
+  updated: string;
+  summary: string;
+  usedIn: string[];
+  stack: string[];
+  assets: string[];
+};
+
+type PromptItem = {
+  id: number;
+  title: string;
+  category: string;
+  owner: string;
+  text: string;
+};
+
+const members: Member[] = [
   {
     id: 1,
-    title: "PF-12 Processing Research Results",
-    space: "R&D",
-    summary: "Summary of findings and experimental data",
-    type: "Report",
-    status: "Active",
-    project: "Orion Runtime",
-    updated: "2h ago",
-    contributors: ["BA"],
-    icon: "chart",
-    tint: "#faf5ff",
-    iconColor: "#9333ea",
-    mine: true,
+    name: "Bold B.",
+    initials: "BB",
+    role: "Full-Stack / UI",
+    skills: ["React", "UX", "Dashboard", "ECharts"],
+    projects: ["FUJI 2024 Research", "Retail Heatmap Tool"],
+    email: "bold.b@ddam.mn",
+    color: "#2563eb",
   },
   {
     id: 2,
-    title: "Service Lower — Model Specification",
-    space: "Service",
-    summary: "Links to relevant reference materials",
-    type: "Specification",
-    status: "Active",
-    project: "Vision Stack",
-    updated: "5h ago",
-    contributors: ["SO"],
-    icon: "wrench",
-    tint: "#f0fdf4",
-    iconColor: "#16a34a",
-    mine: false,
+    name: "Gerel T",
+    initials: "GT",
+    role: "Data Analyst",
+    skills: ["Python", "Media Mix", "BI", "Modeling"],
+    projects: ["FUJI 2024 Research", "Media Mix Model"],
+    email: "bolod@ddam.mn",
+    color: "#059669",
   },
   {
     id: 3,
-    title: "Project: DDAM Integration v2 — Team Members",
-    space: "Platform",
-    summary: "Names, roles, and contact information",
-    type: "Directory",
-    status: "Active",
-    project: "DDAM Core",
-    updated: "1d ago",
-    contributors: ["DG"],
-    icon: "file",
-    tint: "#eff6ff",
-    iconColor: "#2563eb",
-    mine: false,
+    name: "Tsend T.",
+    initials: "TT",
+    role: "Project Manager",
+    skills: ["Planning", "Client", "Research", "Retail"],
+    projects: ["FUJI 2024 Research", "Ad Effectiveness Q4"],
+    email: "tsend@ddam.mn",
+    color: "#d97706",
   },
   {
     id: 4,
-    title: "Adaptive Inference Benchmark Report",
-    space: "R&D",
-    summary: "Performance results across CPU and GPU clusters",
-    type: "Report",
-    status: "Active",
-    project: "Orion Runtime",
-    updated: "2d ago",
-    contributors: ["AV", "NK"],
-    icon: "chart",
-    tint: "#faf5ff",
-    iconColor: "#9333ea",
-    mine: true,
+    name: "Dorj B.",
+    initials: "DB",
+    role: "Backend Developer",
+    skills: ["Node.js", "API", "PostgreSQL", "Cloud"],
+    projects: ["Viz Platform v3"],
+    email: "dorj@ddam.mn",
+    color: "#7c3aed",
   },
   {
     id: 5,
-    title: "Platform Architecture Decision Record",
-    space: "Platform",
-    summary: "Decision rationale and evaluated alternatives",
-    type: "Decision Record",
-    status: "Active",
-    project: "Atlas DS",
-    updated: "3d ago",
-    contributors: ["KA"],
-    icon: "file",
-    tint: "#eff6ff",
-    iconColor: "#2563eb",
-    mine: false,
-  },
-  {
-    id: 6,
-    title: "Shared Prompt Library v3",
-    space: "R&D",
-    summary: "Prompt templates and evaluation notes",
-    type: "Library",
-    status: "Draft",
-    project: "Copilot Core",
-    updated: "Today",
-    contributors: ["NK", "LE"],
-    icon: "file",
-    tint: "#eff6ff",
-    iconColor: "#2563eb",
-    mine: false,
+    name: "Nara E.",
+    initials: "NE",
+    role: "Data Engineer",
+    skills: ["ETL", "Pipeline", "Python", "Data Lake"],
+    projects: ["Media Mix Model"],
+    email: "nara@ddam.mn",
+    color: "#db2777",
   },
 ];
 
 const projects: Project[] = [
   {
     id: 1,
-    name: "Orion Runtime",
-    space: "R&D Space",
-    members: 5,
-    docs: 18,
-    status: "Active",
-    chips: ["PF-12 Processing ...", "Adaptive Inference..."],
+    name: "FUJI 2024 Research",
+    client: "Dentsu Japan",
+    status: "Ongoing",
+    progress: 72,
+    members: ["Gerel T.", "Bolod O.", "Tsend T."],
+    techStack: ["React", "Python", "Survey Analysis", "BI"],
+    description:
+      "Japan consumer market research project with survey data, dashboard prototype, and client-ready insight materials.",
+    goal: "Centralize research data and generate actionable market insights for the FUJI campaign.",
+    problemSolved:
+      "Scattered survey files, manual reporting, and disconnected research notes were unified into a single knowledge base.",
+    timeline: "2024-09-01 → 2024-12-31",
+    screenshots: [
+      "Dashboard prototype",
+      "Survey overview",
+      "Market segmentation",
+    ],
+    lessons: [
+      "Survey naming conventions should be standardized early.",
+      "Client summary should be generated weekly.",
+      "Raw data and interpretation notes should live together.",
+    ],
+    tasks: [
+      { title: "Survey design approval", assignee: "Gerel", status: "Done" },
+      { title: "Data collection Phase 1", assignee: "Bolod", status: "Done" },
+      { title: "Dashboard prototype", assignee: "Gerel", status: "Done" },
+      {
+        title: "Data analysis and visualization",
+        assignee: "Gerel, Bolod",
+        status: "Urgent",
+      },
+      {
+        title: "Client report draft",
+        assignee: "Tsend",
+        status: "In Progress",
+      },
+      { title: "Final presentation deck", assignee: "Gerel", status: "Backlog" },
+    ],
+    files: [
+      {
+        name: "FUJI2024_RawData_v3.xlsx",
+        type: "XL",
+        size: "4.2 MB",
+        owner: "Bolod",
+      },
+      {
+        name: "Survey_Analysis_Q3.xlsx",
+        type: "XL",
+        size: "1.8 MB",
+        owner: "Gerel",
+      },
+      {
+        name: "Client_Presentation_Draft.pptx",
+        type: "PP",
+        size: "6.1 MB",
+        owner: "Tsend",
+      },
+      {
+        name: "Research_Brief_FUJI2024.docx",
+        type: "WD",
+        size: "312 KB",
+        owner: "Tsend",
+      },
+      {
+        name: "Japan_Market_Overview_2024.pdf",
+        type: "PDF",
+        size: "2.4 MB",
+        owner: "Bolod",
+      },
+      {
+        name: "Figma — Dashboard Design",
+        type: "FIG",
+        size: "Link",
+        owner: "Gerel",
+      },
+    ],
   },
   {
     id: 2,
-    name: "Atlas DS",
-    space: "Platform Space",
-    members: 3,
-    docs: 12,
-    status: "Active",
-    chips: ["Platform Architectu..."],
+    name: "Viz Platform v3",
+    client: "Internal",
+    status: "Ongoing",
+    progress: 45,
+    members: ["Gerel T.", "Dorj B."],
+    techStack: ["Vue", "Node.js", "Chart Export", "PostgreSQL"],
+    description:
+      "Internal visualization platform migration with PowerPoint chart export and reusable dashboard blocks.",
+    goal: "Make campaign reporting faster with reusable visualization components.",
+    problemSolved:
+      "Old reporting flow required manual screenshots and repeated deck formatting.",
+    timeline: "2024-08-15 → 2024-11-20",
+    screenshots: ["Chart builder", "Export flow", "Template selector"],
+    lessons: ["Export quality must be tested with real client deck formats."],
+    tasks: [
+      { title: "Vue migration base", assignee: "Dorj", status: "Done" },
+      { title: "Chart export module", assignee: "Gerel", status: "In Progress" },
+      { title: "Template library", assignee: "Dorj", status: "Backlog" },
+    ],
+    files: [
+      {
+        name: "Viz_v3_Architecture.pdf",
+        type: "PDF",
+        size: "910 KB",
+        owner: "Dorj",
+      },
+      {
+        name: "Chart_Export_Test.pptx",
+        type: "PP",
+        size: "3.2 MB",
+        owner: "Gerel",
+      },
+    ],
   },
   {
     id: 3,
-    name: "Vision Stack",
-    space: "Service Space",
-    members: 4,
-    docs: 9,
-    status: "Active",
-    chips: ["Service Lower — ..."],
+    name: "Media Mix Model",
+    client: "Internal / Client Research",
+    status: "Ongoing",
+    progress: 90,
+    members: ["Bolod O.", "Nara E."],
+    techStack: ["Python", "Pandas", "MMM", "Bayesian Model"],
+    description:
+      "Media mix modeling pipeline to estimate channel contribution and budget efficiency.",
+    goal: "Measure media channel impact and recommend optimized budget allocation.",
+    problemSolved:
+      "Campaign performance was hard to compare across channels without consistent model logic.",
+    timeline: "2024-07-01 → 2024-10-30",
+    screenshots: ["Contribution chart", "Spend curve", "Model diagnostics"],
+    lessons: [
+      "Feature engineering documentation is as important as the model result.",
+    ],
+    tasks: [
+      { title: "Data pipeline", assignee: "Nara", status: "Done" },
+      { title: "Model validation", assignee: "Bolod", status: "In Progress" },
+      { title: "Result explainability", assignee: "Bolod", status: "Done" },
+    ],
+    files: [
+      {
+        name: "MMM_Model_Notebook.ipynb",
+        type: "LINK",
+        size: "Link",
+        owner: "Bolod",
+      },
+      {
+        name: "MediaMix_Result_Q4.pdf",
+        type: "PDF",
+        size: "1.1 MB",
+        owner: "Nara",
+      },
+    ],
   },
   {
     id: 4,
-    name: "Nova Search",
-    space: "R&D Space",
-    members: 6,
-    docs: 22,
-    status: "Active",
-    chips: [],
-  },
-  {
-    id: 5,
-    name: "DDAM Core",
-    space: "Platform Space",
-    members: 8,
-    docs: 31,
-    status: "Active",
-    chips: ["Project: DDAM Int..."],
-  },
-  {
-    id: 6,
-    name: "Copilot Core",
-    space: "R&D Space",
-    members: 4,
-    docs: 15,
-    status: "Draft",
-    chips: ["Shared Prompt Lib..."],
+    name: "Retail Heatmap Tool",
+    client: "Retail Client",
+    status: "Planning",
+    progress: 20,
+    members: ["Gerel T.", "Tsend T."],
+    techStack: ["Geo Analytics", "Mapbox", "React"],
+    description:
+      "Geo-analytics tool for store density, customer traffic, and campaign location planning.",
+    goal: "Help retail campaign teams choose better physical activation zones.",
+    problemSolved:
+      "Location planning was based on fragmented Excel files and manual map checks.",
+    timeline: "2024-10-01 → 2025-01-15",
+    screenshots: ["Map prototype", "Store cluster view"],
+    lessons: ["A clean POI data source is required before advanced filters."],
+    tasks: [
+      {
+        title: "POI data source review",
+        assignee: "Tsend",
+        status: "In Progress",
+      },
+      { title: "Map prototype", assignee: "Gerel", status: "Backlog" },
+    ],
+    files: [
+      {
+        name: "Retail_Heatmap_Proposal.pdf",
+        type: "PDF",
+        size: "720 KB",
+        owner: "Tsend",
+      },
+    ],
   },
 ];
 
-function Icon({ name, size = 24 }: { name: IconName; size?: number }): ReactElement {
-  const common = {
-    width: size,
-    height: size,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-  } as const;
+const researchItems: ResearchItem[] = [
+  {
+    id: 1,
+    title: "PF-12 Processing Research Model",
+    type: "AI Model",
+    status: "Validated",
+    owner: "Bolod O.",
+    updated: "2h ago",
+    summary:
+      "Processing model research for classifying campaign documents and extracting structured insights.",
+    usedIn: ["FUJI 2024 Research", "Media Mix Model"],
+    stack: ["Python", "Embeddings", "Classifier", "Evaluation"],
+    assets: ["Benchmark report", "Experiment notes", "Dataset card"],
+  },
+  {
+    id: 2,
+    title: "Service Lower — Model Specification",
+    type: "Service Model",
+    status: "Testing",
+    owner: "Gerel T.",
+    updated: "5h ago",
+    summary:
+      "Service design model for linking project files, briefs, prompts, and related documents.",
+    usedIn: ["DDAM Hub", "Viz Platform v3"],
+    stack: ["React", "Information Architecture", "Search UX"],
+    assets: ["Model spec", "User flow", "Figma"],
+  },
+  {
+    id: 3,
+    title: "Intent-based Smart Search",
+    type: "Experiment",
+    status: "Draft",
+    owner: "Dorj B.",
+    updated: "1d ago",
+    summary:
+      "Search experiment that understands phrases like “projects with React chart export”.",
+    usedIn: ["Viz Platform v3", "DDAM Hub"],
+    stack: ["Vector Search", "Metadata", "Prompt Routing"],
+    assets: ["Search examples", "Evaluation sheet"],
+  },
+  {
+    id: 4,
+    title: "Client Meeting Summary Prompt",
+    type: "Research Note",
+    status: "Validated",
+    owner: "Tsend T.",
+    updated: "2d ago",
+    summary:
+      "Reusable prompt for converting meeting transcripts into summaries, actions, risks, and next steps.",
+    usedIn: ["FUJI 2024 Research", "Retail Heatmap Tool"],
+    stack: ["Prompt", "Meeting Notes", "Action Items"],
+    assets: ["Prompt template", "Output examples"],
+  },
+];
 
-  const icons: Record<IconName, ReactElement> = {
-    book: (
-      <svg {...common}>
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-        <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z" />
-        <path d="M8 2v15" />
-      </svg>
-    ),
-    home: (
-      <svg {...common}>
-        <path d="M3 11l9-8 9 8" />
-        <path d="M5 10v10h5v-6h4v6h5V10" />
-      </svg>
-    ),
-    search: (
-      <svg {...common}>
-        <circle cx="11" cy="11" r="7" />
-        <path d="M20 20l-3.5-3.5" />
-      </svg>
-    ),
-    file: (
-      <svg {...common}>
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <path d="M14 2v6h6" />
-        <path d="M8 13h8" />
-        <path d="M8 17h5" />
-      </svg>
-    ),
-    briefcase: (
-      <svg {...common}>
-        <path d="M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1" />
-        <rect x="3" y="7" width="18" height="13" rx="2" />
-        <path d="M3 12h18" />
-      </svg>
-    ),
-    settings: (
-      <svg {...common}>
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.1 1.65V21a2 2 0 1 1-4 0v-.09a1.8 1.8 0 0 0-1.1-1.65 1.8 1.8 0 0 0-1.98.36l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.8 1.8 0 0 0 4.6 15a1.8 1.8 0 0 0-1.65-1.1H3a2 2 0 1 1 0-4h.09A1.8 1.8 0 0 0 4.74 8a1.8 1.8 0 0 0-.36-1.98l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.8 1.8 0 0 0 9 3.6 1.8 1.8 0 0 0 10.1 2H10a2 2 0 1 1 4 0v.09A1.8 1.8 0 0 0 15 3.74a1.8 1.8 0 0 0 1.98-.36l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.8 1.8 0 0 0 19.4 9c.7.2 1.2.86 1.2 1.6v.8c0 .74-.5 1.4-1.2 1.6z" />
-      </svg>
-    ),
-    menu: (
-      <svg {...common}>
-        <path d="M4 6h16" />
-        <path d="M4 12h16" />
-        <path d="M4 18h16" />
-      </svg>
-    ),
-    dots: (
-      <svg {...common}>
-        <circle cx="5" cy="12" r="1" />
-        <circle cx="12" cy="12" r="1" />
-        <circle cx="19" cy="12" r="1" />
-      </svg>
-    ),
-    microscope: (
-      <svg {...common}>
-        <path d="M6 18h8" />
-        <path d="M3 22h18" />
-        <path d="M14 22a7 7 0 0 0 7-7" />
-        <path d="M9 14h3" />
-        <path d="M10 2v6" />
-        <path d="M8 2h4v8H8z" />
-        <path d="M12 9l4 4" />
-      </svg>
-    ),
-    chip: (
-      <svg {...common}>
-        <rect x="7" y="7" width="10" height="10" rx="1" />
-        <rect x="10" y="10" width="4" height="4" />
-        <path d="M4 9h3" />
-        <path d="M4 15h3" />
-        <path d="M17 9h3" />
-        <path d="M17 15h3" />
-        <path d="M9 4v3" />
-        <path d="M15 4v3" />
-        <path d="M9 17v3" />
-        <path d="M15 17v3" />
-      </svg>
-    ),
-    wrench: (
-      <svg {...common}>
-        <path d="M14.7 6.3a5 5 0 0 0 6.1 6.1L12 21l-3-3 8.8-8.8a5 5 0 0 1-3.1-2.9z" />
-        <path d="M6 18l-3 3" />
-      </svg>
-    ),
-    box: (
-      <svg {...common}>
-        <path d="M21 16V8l-9-5-9 5v8l9 5 9-5z" />
-        <path d="M3.3 7.5L12 12l8.7-4.5" />
-        <path d="M12 22V12" />
-      </svg>
-    ),
-    chart: (
-      <svg {...common}>
-        <path d="M4 19h16" />
-        <path d="M6 19v-5h3v5" />
-        <path d="M11 19v-9h3v9" />
-        <path d="M16 19V5h3v14" />
-      </svg>
-    ),
-    users: (
-      <svg {...common}>
-        <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
-        <circle cx="9.5" cy="7" r="4" />
-        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </svg>
-    ),
-    external: (
-      <svg {...common}>
-        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-        <path d="M15 3h6v6" />
-        <path d="M10 14L21 3" />
-      </svg>
-    ),
-    share: (
-      <svg {...common}>
-        <circle cx="18" cy="5" r="3" />
-        <circle cx="6" cy="12" r="3" />
-        <circle cx="18" cy="19" r="3" />
-        <path d="M8.6 10.6l6.8-4.2" />
-        <path d="M8.6 13.4l6.8 4.2" />
-      </svg>
-    ),
-    download: (
-      <svg {...common}>
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-        <path d="M7 10l5 5 5-5" />
-        <path d="M12 15V3" />
-      </svg>
-    ),
-    close: (
-      <svg {...common}>
-        <path d="M18 6L6 18" />
-        <path d="M6 6l12 12" />
-      </svg>
-    ),
+const prompts: PromptItem[] = [
+  {
+    id: 1,
+    title: "Project Summary Generator",
+    category: "Project",
+    owner: "Tsend T.",
+    text: "Summarize this project into: overview, goal, problem solved, technologies used, timeline, reusable assets, and lessons learned.",
+  },
+  {
+    id: 2,
+    title: "Campaign Idea Proposal",
+    category: "Campaign",
+    owner: "Gerel T.",
+    text: "Generate five campaign ideas using audience insight, channel plan, creative hook, expected KPI, and risk.",
+  },
+  {
+    id: 3,
+    title: "Research Finding Extractor",
+    category: "Research",
+    owner: "Bolod O.",
+    text: "Extract key findings, supporting data, assumptions, limitations, and recommended actions from this research document.",
+  },
+  {
+    id: 4,
+    title: "Client Meeting Summary",
+    category: "Meeting",
+    owner: "Tsend T.",
+    text: "Convert this meeting transcript into summary, decisions, action items, owners, deadlines, open questions, and risks.",
+  },
+];
+
+export default function App() {
+  const [page, setPage] = useState<Page>("home");
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedResearch, setSelectedResearch] = useState<ResearchItem | null>(
+    null,
+  );
+  const [query, setQuery] = useState("");
+
+  const openPage = (nextPage: Page) => {
+    setPage(nextPage);
+    setSelectedProject(null);
+    setSelectedResearch(null);
   };
 
-  return icons[name];
-}
-
-function Avatar({ label }: { label: string }) {
-  const map: Record<string, [string, string]> = {
-    BA: ["#bfdbfe", "#1d4ed8"],
-    SO: ["#bbf7d0", "#166534"],
-    DG: ["#fed7aa", "#9a3412"],
-    AV: ["#bfdbfe", "#1d4ed8"],
-    NK: ["#bfdbfe", "#1d4ed8"],
-    LE: ["#fbcfe8", "#9d174d"],
-    KA: ["#e9d5ff", "#6b21a8"],
+  const openProject = (project: Project) => {
+    setPage("projects");
+    setSelectedProject(project);
+    setSelectedResearch(null);
   };
 
-  const [bg, fg] = map[label] || ["#e5e7eb", "#111827"];
+  const openResearch = (item: ResearchItem) => {
+    setPage("rnd");
+    setSelectedResearch(item);
+    setSelectedProject(null);
+  };
+
+  const closeDetail = () => {
+    setSelectedProject(null);
+    setSelectedResearch(null);
+  };
+
+  const searchResults = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+
+    const projectResults = projects
+      .filter((item) =>
+        [
+          item.name,
+          item.client,
+          item.status,
+          item.description,
+          item.goal,
+          item.problemSolved,
+          item.techStack.join(" "),
+          item.members.join(" "),
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      )
+      .map((item) => ({
+        type: "Project",
+        title: item.name,
+        description: item.description,
+        action: () => openProject(item),
+      }));
+
+    const researchResults = researchItems
+      .filter((item) =>
+        [
+          item.title,
+          item.type,
+          item.summary,
+          item.stack.join(" "),
+          item.usedIn.join(" "),
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      )
+      .map((item) => ({
+        type: "R&D",
+        title: item.title,
+        description: item.summary,
+        action: () => openResearch(item),
+      }));
+
+    const peopleResults = members
+      .filter((item) =>
+        [item.name, item.role, item.skills.join(" "), item.projects.join(" ")]
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      )
+      .map((item) => ({
+        type: "People",
+        title: item.name,
+        description: `${item.role} · ${item.skills.join(", ")}`,
+        action: () => openPage("people"),
+      }));
+
+    const promptResults = prompts
+      .filter((item) =>
+        [item.title, item.category, item.text]
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      )
+      .map((item) => ({
+        type: "Prompt",
+        title: item.title,
+        description: item.text,
+        action: () => openPage("prompts"),
+      }));
+
+    return [
+      ...projectResults,
+      ...researchResults,
+      ...peopleResults,
+      ...promptResults,
+    ];
+  }, [query]);
 
   return (
-    <span className="avatar" style={{ backgroundColor: bg, color: fg }}>
-      {label}
-    </span>
+    <div className="app">
+      <Sidebar page={page} onPage={openPage} />
+
+      <main className="main">
+        <Header
+          page={page}
+          onSearch={() => openPage("search")}
+          titleOverride={
+            selectedProject
+              ? selectedProject.name
+              : selectedResearch
+                ? selectedResearch.title
+                : undefined
+          }
+          subtitleOverride={
+            selectedProject
+              ? "Project detail"
+              : selectedResearch
+                ? "R&D detail"
+                : undefined
+          }
+        />
+
+        {selectedProject && (
+          <ProjectDetail project={selectedProject} onClose={closeDetail} />
+        )}
+
+        {selectedResearch && (
+          <ResearchDetail item={selectedResearch} onClose={closeDetail} />
+        )}
+
+        {!selectedProject && !selectedResearch && page === "home" && (
+          <HomePage
+            onProject={openProject}
+            onProjects={() => openPage("projects")}
+            onResearch={() => openPage("rnd")}
+          />
+        )}
+
+        {!selectedProject && !selectedResearch && page === "projects" && (
+          <ProjectsPage onProject={openProject} />
+        )}
+
+        {!selectedProject && !selectedResearch && page === "rnd" && (
+          <ResearchPage onResearch={openResearch} />
+        )}
+
+        {!selectedProject && !selectedResearch && page === "people" && (
+          <PeoplePage />
+        )}
+
+        {!selectedProject && !selectedResearch && page === "prompts" && (
+          <PromptsPage />
+        )}
+
+        {!selectedProject && !selectedResearch && page === "search" && (
+          <SearchPage
+            query={query}
+            setQuery={setQuery}
+            results={searchResults}
+          />
+        )}
+
+        {!selectedProject && !selectedResearch && page === "settings" && (
+          <SettingsPage />
+        )}
+      </main>
+    </div>
   );
 }
 
 function Sidebar({
   page,
-  activeSpace,
   onPage,
-  onSpace,
 }: {
   page: Page;
-  activeSpace: string;
   onPage: (page: Page) => void;
-  onSpace: (spaceId: string) => void;
 }) {
+  const nav: { id: Page; label: string; icon: string }[] = [
+    { id: "home", label: "Home", icon: "⌂" },
+    { id: "projects", label: "Projects", icon: "▦" },
+    { id: "rnd", label: "R&D / Models", icon: "✦" },
+    { id: "people", label: "People", icon: "●" },
+    { id: "prompts", label: "Prompts", icon: "⌘" },
+    { id: "search", label: "Smart Search", icon: "⌕" },
+    { id: "settings", label: "Settings", icon: "⚙" },
+  ];
+
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="brand-icon">
-          <Icon name="book" size={30} />
+        <div className="brand-icon">▤</div>
+        <div>
+          <h1>DDAM Library System</h1>
         </div>
-        <h1>DDAM Library</h1>
       </div>
 
-      <div className="side-section">
-        <p className="section-label">MAIN</p>
-
-        <button
-          className={`nav-item ${page === "home" ? "active" : ""}`}
-          onClick={() => onPage("home")}
-        >
-          <Icon name="home" />
-          <span>Home</span>
-        </button>
-
-        <button
-          className={`nav-item ${page === "search" ? "active" : ""}`}
-          onClick={() => onPage("search")}
-        >
-          <Icon name="search" />
-          <span>Search</span>
-        </button>
-
-        <button
-          className={`nav-item ${page === "my-documents" ? "active" : ""}`}
-          onClick={() => onPage("my-documents")}
-        >
-          <Icon name="file" />
-          <span>My documents</span>
-        </button>
-      </div>
-
-      <div className="side-section">
-        <p className="section-label">SPACES</p>
-
-        {spaces.map((space) => (
+      <nav className="nav">
+        {nav.map((item) => (
           <button
-            key={space.id}
-            className={`space-nav ${
-              page === "space" && activeSpace === space.id ? "active" : ""
-            }`}
-            onClick={() => onSpace(space.id)}
-          >
-            <span className="dot" style={{ backgroundColor: space.color }} />
-            <span>{space.name}</span>
+            key={item.id}
+            className={page === item.id ? "active" : ""}
+            onClick={() => onPage(item.id)}>
+            <span>{item.icon}</span>
+            {item.label}
           </button>
         ))}
-      </div>
+      </nav>
 
-      <div className="side-section">
-        <p className="section-label">TOOLS</p>
-
-        <button
-          className={`nav-item ${page === "projects" ? "active" : ""}`}
-          onClick={() => onPage("projects")}
-        >
-          <Icon name="briefcase" />
-          <span>Active projects</span>
-        </button>
-
-        <button
-          className={`nav-item ${page === "settings" ? "active" : ""}`}
-          onClick={() => onPage("settings")}
-        >
-          <Icon name="settings" />
-          <span>Settings</span>
-        </button>
+      <div className="sidebar-profile">
+        <Avatar label="BB" color="#2563eb" />
+        <div>
+          <strong>Bold</strong>
+          <p>Workspace Admin</p>
+        </div>
       </div>
     </aside>
   );
 }
 
-function Topbar({
-  onSearchFocus,
+function Header({
+  page,
+  onSearch,
+  titleOverride,
+  subtitleOverride,
 }: {
-  onSearchFocus: () => void;
+  page: Page;
+  onSearch: () => void;
+  titleOverride?: string;
+  subtitleOverride?: string;
 }) {
   return (
     <header className="topbar">
-      <button className="icon-button">
-        <Icon name="menu" />
-      </button>
+      <div>
+        <p className="eyebrow">{subtitleOverride || "DDAM Internal Platform"}</p>
+        <h2>{titleOverride || pageTitle(page)}</h2>
+      </div>
 
-      <button className="top-search" onClick={onSearchFocus}>
-        <Icon name="search" />
-        <span>Search documents, projects, people...</span>
+      <button className="top-search" onClick={onSearch}>
+        <span className="top-search-icon">⌕</span>
+        <span className="top-search-label">
+          Search projects, people, files, models...
+        </span>
         <kbd>⌘K</kbd>
       </button>
 
       <div className="top-actions">
-        <Icon name="dots" />
-        <Avatar label="BA" />
+        <button className="icon-button">•••</button>
+        <Avatar label="BB" color="#2563eb" />
       </div>
     </header>
   );
 }
 
-function DocumentCard({
-  doc,
-  onClick,
-}: {
-  doc: DocumentItem;
-  onClick: (doc: DocumentItem) => void;
-}) {
-  return (
-    <button className="document-card" onClick={() => onClick(doc)}>
-      <div
-        className="doc-icon"
-        style={
-          {
-            backgroundColor: doc.tint,
-            color: doc.iconColor,
-          } as CSSProperties
-        }
-      >
-        <Icon name={doc.icon} />
-      </div>
+function pageTitle(page: Page) {
+  const map: Record<Page, string> = {
+    home: "Overview",
+    projects: "Project Library",
+    rnd: "R&D and Models",
+    people: "People Directory",
+    prompts: "Prompt Library",
+    search: "Smart Search",
+    settings: "Settings",
+  };
 
-      <div className="doc-main">
-        <h3>{doc.title}</h3>
-        <p>
-          {doc.space} · {doc.summary}
-        </p>
-      </div>
-
-      <div className="doc-meta">
-        <div className="avatars">
-          {doc.contributors.map((item) => (
-            <Avatar key={item} label={item} />
-          ))}
-        </div>
-        <span>{doc.updated}</span>
-      </div>
-    </button>
-  );
+  return map[page];
 }
 
 function HomePage({
-  onSpace,
-  onDoc,
-  onSearch,
+  onProject,
+  onProjects,
+  onResearch,
 }: {
-  onSpace: (spaceId: string) => void;
-  onDoc: (doc: DocumentItem) => void;
-  onSearch: () => void;
+  onProject: (project: Project) => void;
+  onProjects: () => void;
+  onResearch: () => void;
 }) {
+  const activeProjects = projects.filter(
+    (project) => project.status === "Ongoing",
+  );
+
   return (
     <div className="page">
-      <section>
-        <h2 className="page-title">Spaces</h2>
-        <p className="page-subtitle">Browse knowledge by team</p>
-
-        <div className="spaces-grid">
-          {spaces.map((space) => (
-            <button
-              key={space.id}
-              className="space-card"
-              onClick={() => onSpace(space.id)}
-            >
-              <div
-                className="space-icon"
-                style={{ backgroundColor: space.tint, color: "#333" }}
-              >
-                <Icon name={space.icon} size={31} />
-              </div>
-              <h3>{space.name}</h3>
-              <p>{space.desc}</p>
-              <span className="pill">{space.docs} docs</span>
-            </button>
-          ))}
-        </div>
+      <section className="stats-grid">
+        <StatCard
+          label="Total Projects"
+          value="12"
+          note="3 new this month"
+          tone="blue"
+        />
+        <StatCard
+          label="Ongoing"
+          value="7"
+          note="2 need attention"
+          tone="green"
+        />
+        <StatCard
+          label="Team Members"
+          value="24"
+          note="5 teams"
+          tone="orange"
+        />
+        <StatCard
+          label="Knowledge Assets"
+          value="148"
+          note="16 this week"
+          tone="purple"
+        />
       </section>
 
-      <section className="recent-section">
-        <div className="section-head">
-          <div>
-            <h2 className="page-title">Recent documents</h2>
-            <p className="page-subtitle">Last updated across all spaces</p>
+      <section className="two-column">
+        <div className="panel">
+          <PanelHeader
+            title="Active Projects"
+            action="View all"
+            onAction={onProjects}
+          />
+          <div className="project-list">
+            {activeProjects.map((project) => (
+              <ProjectRow
+                key={project.id}
+                project={project}
+                onClick={() => onProject(project)}
+              />
+            ))}
           </div>
-
-          <button className="outline-button" onClick={onSearch}>
-            <Icon name="search" size={20} />
-            Search all
-          </button>
         </div>
 
-        <div className="list">
-          {documents.map((doc) => (
-            <DocumentCard key={doc.id} doc={doc} onClick={onDoc} />
-          ))}
+        <div className="panel">
+          <PanelHeader title="Team Members" action="Directory" />
+          <div className="member-list">
+            {members.slice(0, 5).map((member) => (
+              <MemberRow key={member.id} member={member} />
+            ))}
+          </div>
         </div>
       </section>
-    </div>
-  );
-}
 
-function SearchPage({
-  onDoc,
-}: {
-  onDoc: (doc: DocumentItem) => void;
-}) {
-  const [query, setQuery] = useState("");
+      <section className="quick-grid">
+        <button className="quick-card" onClick={onProjects}>
+          <h3>Project Library</h3>
+          <p>
+            Centralized project information, files, links, screenshots, and
+            lessons learned.
+          </p>
+        </button>
 
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
+        <button className="quick-card" onClick={onResearch}>
+          <h3>R&D / Models</h3>
+          <p>
+            Recently researched AI models, service models, experiments, and
+            research notes.
+          </p>
+        </button>
+      </section>
 
-    if (!q) return documents;
-
-    return documents.filter((doc) =>
-      [doc.title, doc.space, doc.summary, doc.project]
-        .join(" ")
-        .toLowerCase()
-        .includes(q)
-    );
-  }, [query]);
-
-  return (
-    <div className="page">
-      <h2 className="page-title">Search</h2>
-      <p className="page-subtitle">Search across all spaces, projects, and people</p>
-
-      <div className="big-search">
-        <Icon name="search" />
-        <input
-          autoFocus
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search documents, projects, people..."
-        />
-        <kbd>⌘K</kbd>
-      </div>
-
-      {results.length > 0 ? (
-        <div className="list search-list">
-          {results.map((doc) => (
-            <DocumentCard key={doc.id} doc={doc} onClick={onDoc} />
-          ))}
+      <section className="panel">
+        <PanelHeader title="Recent Activity" />
+        <div className="activity-grid">
+          <Activity
+            color="#2563eb"
+            title="Anna added a new FUJI dashboard file"
+            time="5 min ago"
+          />
+          <Activity
+            color="#f59e0b"
+            title="Dorj reviewed Viz Platform export flow"
+            time="32 min ago"
+          />
+          <Activity
+            color="#10b981"
+            title="Bolod updated Media Mix model results"
+            time="2h ago"
+          />
+          <Activity
+            color="#ec4899"
+            title="Tsend opened Retail Heatmap planning"
+            time="Yesterday"
+          />
         </div>
-      ) : (
-        <div className="empty-state">No results found for "{query}"</div>
-      )}
-    </div>
-  );
-}
-
-function MyDocumentsPage({
-  onDoc,
-}: {
-  onDoc: (doc: DocumentItem) => void;
-}) {
-  const mine = documents.filter((doc) => doc.mine);
-
-  return (
-    <div className="page">
-      <h2 className="page-title">My Documents</h2>
-      <p className="page-subtitle">Documents you authored or contributed to</p>
-
-      <div className="list search-list">
-        {mine.map((doc) => (
-          <DocumentCard key={doc.id} doc={doc} onClick={onDoc} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function SpacePage({
-  activeSpace,
-  onDoc,
-}: {
-  activeSpace: string;
-  onDoc: (doc: DocumentItem) => void;
-}) {
-  const [query, setQuery] = useState("");
-  const space = spaces.find((item) => item.id === activeSpace) || spaces[0];
-
-  const filtered = documents.filter((doc) => {
-    const sameSpace = doc.space === space.name;
-    const q = query.trim().toLowerCase();
-
-    if (!q) return sameSpace;
-
-    return (
-      sameSpace &&
-      [doc.title, doc.summary, doc.project].join(" ").toLowerCase().includes(q)
-    );
-  });
-
-  return (
-    <div className="page">
-      <div className="space-header">
-        <div
-          className="space-icon large"
-          style={{ backgroundColor: space.tint, color: "#333" }}
-        >
-          <Icon name={space.icon} size={40} />
-        </div>
-
-        <div>
-          <h2 className="page-title">{space.name}</h2>
-          <p className="page-subtitle">{space.desc}</p>
-          <span className="pill">{space.docs} docs</span>
-        </div>
-      </div>
-
-      <div className="space-search">
-        <Icon name="search" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={`Search in ${space.name}...`}
-        />
-      </div>
-
-      <div className="list">
-        {filtered.map((doc) => (
-          <DocumentCard key={doc.id} doc={doc} onClick={onDoc} />
-        ))}
-      </div>
+      </section>
     </div>
   );
 }
 
 function ProjectsPage({
-  onDoc,
+  onProject,
 }: {
-  onDoc: (doc: DocumentItem) => void;
+  onProject: (project: Project) => void;
 }) {
   return (
     <div className="page">
-      <h2 className="page-title">Active Projects</h2>
-      <p className="page-subtitle">Track ongoing work and linked materials</p>
+      <SectionTitle
+        title="All Projects"
+        description="Browse internal and client projects with owners, files, timelines, and reusable assets."
+        action="+ New Project"
+      />
 
-      <div className="projects-grid">
+      <div className="card-grid">
         {projects.map((project) => (
           <button
             key={project.id}
             className="project-card"
-            onClick={() => onDoc(documents[project.id % documents.length])}
-          >
-            <div className="project-top">
+            onClick={() => onProject(project)}>
+            <div className="card-head">
               <div>
                 <h3>{project.name}</h3>
-                <p>{project.space}</p>
+                <p>{project.client}</p>
               </div>
-
-              <span className={`status ${project.status === "Draft" ? "draft" : ""}`}>
-                {project.status}
-              </span>
+              <StatusBadge status={project.status} />
             </div>
 
-            <div className="project-stats">
-              <span>
-                <Icon name="users" size={18} />
-                {project.members} members
-              </span>
-              <span>
-                <Icon name="file" size={18} />
-                {project.docs} docs
-              </span>
+            <p className="card-desc">{project.description}</p>
+
+            <Progress value={project.progress} />
+
+            <div className="meta-row">
+              <span>{project.progress}% complete</span>
+              <span>{project.members.length} members</span>
+              <span>{project.files.length} files</span>
             </div>
 
-            <div className="chips">
-              {project.chips.map((chip) => (
-                <span key={chip}>{chip}</span>
+            <TagList items={project.techStack.slice(0, 4)} />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ResearchPage({
+  onResearch,
+}: {
+  onResearch: (item: ResearchItem) => void;
+}) {
+  const models = researchItems.filter(
+    (item) => item.type === "AI Model" || item.type === "Experiment",
+  );
+  const services = researchItems.filter(
+    (item) => item.type === "Service Model",
+  );
+  const notes = researchItems.filter((item) => item.type === "Research Note");
+
+  return (
+    <div className="page">
+      <SectionTitle
+        title="R&D Knowledge Base"
+        description="Separate from projects: recently researched AI models, service models, experiments, and reusable research notes."
+        action="+ Add Research"
+      />
+
+      <div className="research-columns">
+        <ResearchColumn
+          title="AI Models and Experiments"
+          items={models}
+          onResearch={onResearch}
+        />
+        <ResearchColumn
+          title="Service Models"
+          items={services}
+          onResearch={onResearch}
+        />
+        <ResearchColumn
+          title="Research Notes"
+          items={notes}
+          onResearch={onResearch}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ResearchColumn({
+  title,
+  items,
+  onResearch,
+}: {
+  title: string;
+  items: ResearchItem[];
+  onResearch: (item: ResearchItem) => void;
+}) {
+  return (
+    <div className="panel">
+      <PanelHeader title={title} />
+      <div className="research-list">
+        {items.map((item) => (
+          <button
+            key={item.id}
+            className="research-card"
+            onClick={() => onResearch(item)}>
+            <div className="research-top">
+              <span>{item.type}</span>
+              <ResearchStatus status={item.status} />
+            </div>
+            <h3>{item.title}</h3>
+            <p>{item.summary}</p>
+            <TagList items={item.stack.slice(0, 3)} />
+            <small>
+              {item.owner} · {item.updated}
+            </small>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PeoplePage() {
+  return (
+    <div className="page">
+      <SectionTitle
+        title="People Directory"
+        description="Find team members by role, skills, expertise, and projects they worked on."
+      />
+
+      <div className="card-grid">
+        {members.map((member) => (
+          <div key={member.id} className="person-card">
+            <div className="person-head">
+              <Avatar label={member.initials} color={member.color} />
+              <div>
+                <h3>{member.name}</h3>
+                <p>{member.role}</p>
+              </div>
+            </div>
+
+            <TagList items={member.skills} />
+
+            <div className="worked-on">
+              <strong>Projects worked on</strong>
+              {member.projects.map((project) => (
+                <p key={project}>• {project}</p>
               ))}
             </div>
+
+            <small>{member.email}</small>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PromptsPage() {
+  return (
+    <div className="page">
+      <SectionTitle
+        title="Prompt Library"
+        description="Reusable prompts for campaigns, proposals, research, reports, and meeting summaries."
+        action="+ New Prompt"
+      />
+
+      <div className="card-grid">
+        {prompts.map((prompt) => (
+          <div key={prompt.id} className="prompt-card">
+            <div className="prompt-head">
+              <span>{prompt.category}</span>
+              <small>{prompt.owner}</small>
+            </div>
+            <h3>{prompt.title}</h3>
+            <p>{prompt.text}</p>
+            <button>Copy Prompt</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SearchPage({
+  query,
+  setQuery,
+  results,
+}: {
+  query: string;
+  setQuery: (value: string) => void;
+  results: {
+    type: string;
+    title: string;
+    description: string;
+    action: () => void;
+  }[];
+}) {
+  return (
+    <div className="page">
+      <SectionTitle
+        title="Smart Search"
+        description="Search across projects, people, files, prompts, research models, and service models."
+      />
+
+      <div className="search-box">
+        <span className="top-search-icon">⌕</span>
+        <input
+          autoFocus
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder='Try: "Who worked on React dashboards?"'
+        />
+        <kbd>⌘K</kbd>
+      </div>
+
+      <div className="search-examples">
+        <button onClick={() => setQuery("React dashboard")}>
+          React dashboard
+        </button>
+        <button onClick={() => setQuery("Media Mix")}>Media Mix</button>
+        <button onClick={() => setQuery("service model")}>Service model</button>
+        <button onClick={() => setQuery("campaign proposal")}>
+          Campaign proposal
+        </button>
+      </div>
+
+      <div className="result-list">
+        {query.trim() && results.length === 0 && (
+          <div className="empty-state">No results found for “{query}”</div>
+        )}
+
+        {results.map((result, index) => (
+          <button
+            key={`${result.type}-${result.title}-${index}`}
+            className="result-card"
+            onClick={result.action}>
+            <span>{result.type}</span>
+            <h3>{result.title}</h3>
+            <p>{result.description}</p>
           </button>
         ))}
       </div>
@@ -825,180 +1052,485 @@ function ProjectsPage({
 function SettingsPage() {
   return (
     <div className="page">
-      <h2 className="page-title">Settings & Admin</h2>
-      <p className="page-subtitle">System stats, access control, and configuration</p>
+      <SectionTitle
+        title="Settings"
+        description="Workspace stats, access control, and configuration overview."
+      />
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h3>377</h3>
-          <p>Total documents</p>
-        </div>
-        <div className="stat-card">
-          <h3>126</h3>
-          <p>Active users</p>
-        </div>
-        <div className="stat-card">
-          <h3>5</h3>
-          <p>Spaces</p>
-        </div>
-        <div className="stat-card">
-          <h3>38</h3>
-          <p>Projects</p>
-        </div>
+      <div className="settings-stats">
+        <StatSimple value="377" label="Total documents" />
+        <StatSimple value="126" label="Active users" />
+        <StatSimple value="12" label="Projects" />
+        <StatSimple value="38" label="Research assets" />
       </div>
 
-      <div className="access-card">
-        <h3>Access Control</h3>
-
-        {spaces.map((space) => (
-          <div key={space.id} className="access-row">
-            <div>
-              <span className="dot" style={{ backgroundColor: space.color }} />
-              <span>{space.name}</span>
-            </div>
-            <span>{space.docs} docs</span>
-          </div>
-        ))}
+      <div className="panel">
+        <PanelHeader title="Access Overview" />
+        <div className="access-list">
+          <AccessRow label="Projects" value="12 projects" color="#2563eb" />
+          <AccessRow label="R&D and Models" value="38 assets" color="#7c3aed" />
+          <AccessRow
+            label="People Directory"
+            value="24 users"
+            color="#10b981"
+          />
+          <AccessRow
+            label="Prompt Library"
+            value="42 prompts"
+            color="#f59e0b"
+          />
+        </div>
       </div>
     </div>
   );
 }
 
-function DetailModal({
-  doc,
+function ProjectDetail({
+  project,
   onClose,
 }: {
-  doc: DocumentItem;
+  project: Project;
   onClose: () => void;
 }) {
-  const related = documents.filter(
-    (item) => item.space === doc.space && item.id !== doc.id
-  );
-
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-head">
-          <div>
-            <h2>{doc.title}</h2>
-            <p>
-              {doc.space} · {doc.summary}
-            </p>
-          </div>
+    <div className="page detail-page">
+      <button className="back-button" onClick={onClose}>
+        <span>←</span>
+        Back to Projects
+      </button>
 
-          <button className="modal-close" onClick={onClose}>
-            <Icon name="close" />
-          </button>
+      <section className="detail-hero">
+        <div className="detail-hero-main">
+          <div className="detail-icon project-icon">▦</div>
+
+          <div>
+            <p className="eyebrow">Project Detail</p>
+            <h1>{project.name}</h1>
+            <p>{project.description}</p>
+
+            <div className="detail-meta-pills">
+              <span>{project.client}</span>
+              <span>{project.timeline}</span>
+              <StatusBadge status={project.status} />
+            </div>
+          </div>
         </div>
 
-        <div className="modal-body">
-          <div className="info-grid">
-            <div className="info-box">
-              <span>TYPE</span>
-              <p>{doc.type}</p>
-            </div>
-            <div className="info-box">
-              <span>STATUS</span>
-              <p>{doc.status}</p>
-            </div>
-            <div className="info-box">
-              <span>SPACE</span>
-              <p>{doc.space}</p>
-            </div>
-            <div className="info-box">
-              <span>PROJECT</span>
-              <p>{doc.project}</p>
-            </div>
-            <div className="info-box">
-              <span>UPDATED</span>
-              <p>{doc.updated}</p>
-            </div>
-            <div className="info-box">
-              <span>CONTRIBUTORS</span>
-              <p>{doc.contributors.join(", ")}</p>
+        <div className="detail-progress-card">
+          <span>Overall Progress</span>
+          <strong>{project.progress}%</strong>
+          <Progress value={project.progress} />
+        </div>
+      </section>
+
+      <div className="detail-layout">
+        <div className="detail-primary">
+          <div className="panel">
+            <PanelHeader title="Project Overview" />
+            <div className="info-grid">
+              <Info label="Client" value={project.client} />
+              <Info label="Status" value={project.status} />
+              <Info label="Timeline" value={project.timeline} />
+              <Info label="Members" value={project.members.join(", ")} />
+              <Info label="Goal" value={project.goal} wide />
+              <Info
+                label="Problem Solved"
+                value={project.problemSolved}
+                wide
+              />
             </div>
           </div>
 
-          <p className="related-title">RELATED IN {doc.space.toUpperCase()}</p>
-
-          <div className="related-list">
-            {related.slice(0, 2).map((item) => (
-              <div key={item.id} className="related-item">
-                <Icon name="file" size={20} />
-                <div>
-                  <h4>{item.title}</h4>
-                  <p>{item.summary}</p>
+          <div className="panel">
+            <PanelHeader title="Tasks" action="Add task" />
+            <div className="task-list">
+              {project.tasks.map((task) => (
+                <div key={task.title} className="task-row">
+                  <span
+                    className={`check ${task.status === "Done" ? "done" : ""}`}
+                  >
+                    ✓
+                  </span>
+                  <strong>{task.title}</strong>
+                  <small>{task.assignee}</small>
+                  <TaskStatus status={task.status} />
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="panel">
+            <PanelHeader title="Files and Assets" />
+            <div className="file-list">
+              {project.files.map((file) => (
+                <div key={file.name} className="file-row">
+                  <span className={`file-type ${file.type.toLowerCase()}`}>
+                    {file.type}
+                  </span>
+                  <div>
+                    <strong>{file.name}</strong>
+                    <p>Added by {file.owner}</p>
+                  </div>
+                  <small>{file.size}</small>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <aside className="detail-secondary">
+          <div className="panel">
+            <PanelHeader title="Team" />
+            {project.members.map((name) => {
+              const member = members.find((item) => item.name === name);
+              return member ? (
+                <MemberRow key={name} member={member} compact />
+              ) : null;
+            })}
+          </div>
+
+          <div className="panel ai-panel">
+            <PanelHeader title="AI Assistant" action="Project-aware" />
+
+            <div className="ai-bubble">
+              I can summarize this project, find related files, explain
+              progress, and prepare a client-ready update.
+            </div>
+
+            <div className="ai-actions">
+              <button>Summarize</button>
+              <button>Find files</button>
+              <button>List risks</button>
+              <button>Create update</button>
+            </div>
+
+            <div className="ai-input">
+              <input placeholder="Ask about this project..." />
+              <button>↑</button>
+            </div>
+          </div>
+
+          <div className="panel">
+            <PanelHeader title="Lessons Learned" />
+            <div className="notes-list">
+              {project.lessons.map((lesson) => (
+                <p key={lesson}>• {lesson}</p>
+              ))}
+            </div>
+          </div>
+
+          <div className="panel">
+            <PanelHeader title="Screenshots" />
+            <div className="screenshot-list">
+              {project.screenshots.map((shot) => (
+                <span key={shot}>{shot}</span>
+              ))}
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
+function ResearchDetail({
+  item,
+  onClose,
+}: {
+  item: ResearchItem;
+  onClose: () => void;
+}) {
+  return (
+    <div className="page detail-page">
+      <button className="back-button" onClick={onClose}>
+        <span>←</span>
+        Back to R&D
+      </button>
+
+      <section className="detail-hero research-hero">
+        <div className="detail-hero-main">
+          <div className="detail-icon research-icon">✦</div>
+
+          <div>
+            <p className="eyebrow">R&D Detail</p>
+            <h1>{item.title}</h1>
+            <p>{item.summary}</p>
+
+            <div className="detail-meta-pills">
+              <span>{item.type}</span>
+              <span>{item.owner}</span>
+              <span>{item.updated}</span>
+              <ResearchStatus status={item.status} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="detail-layout research-detail-layout">
+        <div className="panel">
+          <PanelHeader title="Research Information" />
+          <div className="info-grid">
+            <Info label="Type" value={item.type} />
+            <Info label="Status" value={item.status} />
+            <Info label="Owner" value={item.owner} />
+            <Info label="Updated" value={item.updated} />
+            <Info label="Summary" value={item.summary} wide />
+          </div>
+        </div>
+
+        <div className="panel">
+          <PanelHeader title="Used In Projects" />
+          <div className="padded-tags">
+            <TagList items={item.usedIn} />
+          </div>
+        </div>
+
+        <div className="panel">
+          <PanelHeader title="Methods and Stack" />
+          <div className="padded-tags">
+            <TagList items={item.stack} />
+          </div>
+        </div>
+
+        <div className="panel">
+          <PanelHeader title="Related Assets" />
+          <div className="file-list">
+            {item.assets.map((asset) => (
+              <div key={asset} className="file-row">
+                <span className="file-type link">DOC</span>
+                <div>
+                  <strong>{asset}</strong>
+                  <p>R&D asset</p>
+                </div>
+                <small>Link</small>
               </div>
             ))}
           </div>
-
-          <div className="modal-actions">
-            <button className="primary-button">
-              <Icon name="external" size={20} />
-              Open document
-            </button>
-            <button className="outline-button">
-              <Icon name="share" size={20} />
-              Share
-            </button>
-            <button className="outline-button">
-              <Icon name="download" size={20} />
-              Download
-            </button>
-          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default function App() {
-  const [page, setPage] = useState<Page>("home");
-  const [activeSpace, setActiveSpace] = useState("rd");
-  const [selectedDoc, setSelectedDoc] = useState<DocumentItem | null>(null);
-
-  const handleSpace = (spaceId: string) => {
-    setActiveSpace(spaceId);
-    setPage("space");
-  };
-
+function StatCard({
+  label,
+  value,
+  note,
+  tone,
+}: {
+  label: string;
+  value: string;
+  note: string;
+  tone: "blue" | "green" | "orange" | "purple";
+}) {
   return (
-    <div className="app">
-      <Sidebar
-        page={page}
-        activeSpace={activeSpace}
-        onPage={setPage}
-        onSpace={handleSpace}
-      />
+    <div className={`stat-card ${tone}`}>
+      <p>{label}</p>
+      <h3>{value}</h3>
+      <span>{note}</span>
+    </div>
+  );
+}
 
-      <main className="main">
-        <Topbar onSearchFocus={() => setPage("search")} />
+function StatSimple({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="stat-simple">
+      <h3>{value}</h3>
+      <p>{label}</p>
+    </div>
+  );
+}
 
-        {page === "home" && (
-          <HomePage
-            onSpace={handleSpace}
-            onDoc={setSelectedDoc}
-            onSearch={() => setPage("search")}
-          />
-        )}
+function PanelHeader({
+  title,
+  action,
+  onAction,
+}: {
+  title: string;
+  action?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="panel-header">
+      <h3>{title}</h3>
+      {action && <button onClick={onAction}>{action}</button>}
+    </div>
+  );
+}
 
-        {page === "search" && <SearchPage onDoc={setSelectedDoc} />}
+function SectionTitle({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description: string;
+  action?: string;
+}) {
+  return (
+    <div className="section-title">
+      <div>
+        <h2>{title}</h2>
+        <p>{description}</p>
+      </div>
+      {action && <button className="primary-button">{action}</button>}
+    </div>
+  );
+}
 
-        {page === "my-documents" && <MyDocumentsPage onDoc={setSelectedDoc} />}
+function ProjectRow({
+  project,
+  onClick,
+}: {
+  project: Project;
+  onClick: () => void;
+}) {
+  return (
+    <button className="project-row" onClick={onClick}>
+      <span className="row-dot" />
+      <div className="row-main">
+        <strong>{project.name}</strong>
+        <p>
+          {project.client} · {project.members.join(", ")}
+        </p>
+      </div>
+      <div className="row-progress">
+        <Progress value={project.progress} />
+        <b>{project.progress}%</b>
+      </div>
+      <StatusText status={project.status} />
+    </button>
+  );
+}
 
-        {page === "space" && (
-          <SpacePage activeSpace={activeSpace} onDoc={setSelectedDoc} />
-        )}
+function MemberRow({
+  member,
+  compact = false,
+}: {
+  member: Member;
+  compact?: boolean;
+}) {
+  return (
+    <div className={`member-row ${compact ? "compact" : ""}`}>
+      <Avatar label={member.initials} color={member.color} />
+      <div>
+        <strong>{member.name}</strong>
+        <p>{member.role}</p>
+        {!compact && <TagList items={member.skills.slice(0, 2)} small />}
+      </div>
+      {!compact && <span className="online-dot" />}
+    </div>
+  );
+}
 
-        {page === "projects" && <ProjectsPage onDoc={setSelectedDoc} />}
+function Activity({
+  color,
+  title,
+  time,
+}: {
+  color: string;
+  title: string;
+  time: string;
+}) {
+  return (
+    <div className="activity-card">
+      <span style={{ backgroundColor: color }} />
+      <strong>{title}</strong>
+      <p>{time}</p>
+    </div>
+  );
+}
 
-        {page === "settings" && <SettingsPage />}
-      </main>
+function Avatar({ label, color }: { label: string; color: string }) {
+  return (
+    <span className="avatar" style={{ backgroundColor: color }}>
+      {label}
+    </span>
+  );
+}
 
-      {selectedDoc && (
-        <DetailModal doc={selectedDoc} onClose={() => setSelectedDoc(null)} />
-      )}
+function Progress({ value }: { value: number }) {
+  return (
+    <div className="progress">
+      <span style={{ width: `${value}%` }} />
+    </div>
+  );
+}
+
+function TagList({
+  items,
+  small = false,
+}: {
+  items: string[];
+  small?: boolean;
+}) {
+  return (
+    <div className={`tag-list ${small ? "small" : ""}`}>
+      {items.map((item) => (
+        <span key={item}>{item}</span>
+      ))}
+    </div>
+  );
+}
+
+function StatusBadge({ status }: { status: ProjectStatus }) {
+  return (
+    <span className={`status-badge ${status.toLowerCase()}`}>{status}</span>
+  );
+}
+
+function StatusText({ status }: { status: ProjectStatus }) {
+  return (
+    <span className={`status-text ${status.toLowerCase()}`}>{status}</span>
+  );
+}
+
+function ResearchStatus({ status }: { status: ResearchStatus }) {
+  return (
+    <span className={`research-status ${status.toLowerCase()}`}>{status}</span>
+  );
+}
+
+function TaskStatus({ status }: { status: Task["status"] }) {
+  return (
+    <span className={`task-status ${status.toLowerCase().replace(" ", "-")}`}>
+      {status}
+    </span>
+  );
+}
+
+function Info({
+  label,
+  value,
+  wide = false,
+}: {
+  label: string;
+  value: string;
+  wide?: boolean;
+}) {
+  return (
+    <div className={`info-box ${wide ? "wide" : ""}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function AccessRow({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
+  return (
+    <div className="access-row">
+      <div>
+        <span style={{ backgroundColor: color }} />
+        <strong>{label}</strong>
+      </div>
+      <p>{value}</p>
     </div>
   );
 }
