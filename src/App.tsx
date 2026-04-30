@@ -1,12 +1,6 @@
 import { useMemo, useState } from "react";
 
-type Page =
-  | "home"
-  | "projects"
-  | "rnd"
-  | "people"
-  | "prompts"
-  | "search"
+type Page = "home" | "projects" | "rnd" | "people" | "prompts" | "search";
 
 type ProjectStatus = "Planning" | "Ongoing" | "Done";
 type ResearchStatus = "Testing" | "Validated" | "Draft" | "Archived";
@@ -166,7 +160,11 @@ const projects: Project[] = [
         assignee: "Tsend",
         status: "In Progress",
       },
-      { title: "Final presentation deck", assignee: "Gerel", status: "Backlog" },
+      {
+        title: "Final presentation deck",
+        assignee: "Gerel",
+        status: "Backlog",
+      },
     ],
     files: [
       {
@@ -225,7 +223,11 @@ const projects: Project[] = [
     lessons: ["Export quality must be tested with real client deck formats."],
     tasks: [
       { title: "Vue migration base", assignee: "Dorj", status: "Done" },
-      { title: "Chart export module", assignee: "Gerel", status: "In Progress" },
+      {
+        title: "Chart export module",
+        assignee: "Gerel",
+        status: "In Progress",
+      },
       { title: "Template library", assignee: "Dorj", status: "Backlog" },
     ],
     files: [
@@ -646,7 +648,9 @@ function Header({
   return (
     <header className="topbar">
       <div>
-        <p className="eyebrow">{subtitleOverride || "DDAM Internal Platform"}</p>
+        <p className="eyebrow">
+          {subtitleOverride || "DDAM Internal Platform"}
+        </p>
         <h2>{titleOverride || pageTitle(page)}</h2>
       </div>
 
@@ -842,7 +846,6 @@ function ResearchPage({
 
   return (
     <div className="page">
-
       <div className="research-columns">
         <ResearchColumn
           title="AI Models and Experiments"
@@ -933,7 +936,6 @@ function PeoplePage() {
 function PromptsPage() {
   return (
     <div className="page">
-
       <div className="card-grid">
         {prompts.map((prompt) => (
           <div key={prompt.id} className="prompt-card">
@@ -1009,7 +1011,6 @@ function SearchPage({
   );
 }
 
-
 function ProjectDetail({
   project,
   onClose,
@@ -1058,11 +1059,7 @@ function ProjectDetail({
               <Info label="Timeline" value={project.timeline} />
               <Info label="Members" value={project.members.join(", ")} />
               <Info label="Goal" value={project.goal} wide />
-              <Info
-                label="Problem Solved"
-                value={project.problemSolved}
-                wide
-              />
+              <Info label="Problem Solved" value={project.problemSolved} wide />
             </div>
           </div>
 
@@ -1072,8 +1069,7 @@ function ProjectDetail({
               {project.tasks.map((task) => (
                 <div key={task.title} className="task-row">
                   <span
-                    className={`check ${task.status === "Done" ? "done" : ""}`}
-                  >
+                    className={`check ${task.status === "Done" ? "done" : ""}`}>
                     ✓
                   </span>
                   <strong>{task.title}</strong>
@@ -1084,19 +1080,40 @@ function ProjectDetail({
             </div>
           </div>
 
-          <div className="panel">
-            <PanelHeader title="Files and Assets" />
+          <div className="panel files-panel">
+            <div className="files-panel-header">
+              <div>
+                <h3>Files and Assets</h3>
+                <p>View, download, or share project materials.</p>
+              </div>
+
+              <button className="upload-button">+ Add file</button>
+            </div>
+
             <div className="file-list">
               {project.files.map((file) => (
-                <div key={file.name} className="file-row">
+                <div key={file.name} className="file-row enhanced-file-row">
                   <span className={`file-type ${file.type.toLowerCase()}`}>
                     {file.type}
                   </span>
-                  <div>
+
+                  <div className="file-main">
                     <strong>{file.name}</strong>
-                    <p>Added by {file.owner}</p>
+                    <p>
+                      Added by {file.owner} · {file.size}
+                    </p>
                   </div>
-                  <small>{file.size}</small>
+
+                  <div className="file-actions">
+                    <button
+                      className="disabled-file-action"
+                      disabled
+                      title="Download is not available yet">
+                      Download
+                    </button>
+
+                    <button>Share</button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1157,6 +1174,7 @@ function ProjectDetail({
     </div>
   );
 }
+
 function ResearchDetail({
   item,
   onClose,
