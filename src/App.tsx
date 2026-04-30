@@ -7,7 +7,7 @@ type Page =
   | "people"
   | "prompts"
   | "search"
-  | "settings";
+
 type ProjectStatus = "Planning" | "Ongoing" | "Done";
 type ResearchStatus = "Testing" | "Validated" | "Draft" | "Archived";
 
@@ -579,10 +579,6 @@ export default function App() {
             results={searchResults}
           />
         )}
-
-        {!selectedProject && !selectedResearch && page === "settings" && (
-          <SettingsPage />
-        )}
       </main>
     </div>
   );
@@ -602,7 +598,6 @@ function Sidebar({
     { id: "people", label: "People", icon: "●" },
     { id: "prompts", label: "Prompts", icon: "⌘" },
     { id: "search", label: "Smart Search", icon: "⌕" },
-    { id: "settings", label: "Settings", icon: "⚙" },
   ];
 
   return (
@@ -655,14 +650,6 @@ function Header({
         <h2>{titleOverride || pageTitle(page)}</h2>
       </div>
 
-      <button className="top-search" onClick={onSearch}>
-        <span className="top-search-icon">⌕</span>
-        <span className="top-search-label">
-          Search projects, people, files, models...
-        </span>
-        <kbd>⌘K</kbd>
-      </button>
-
       <div className="top-actions">
         <button className="icon-button">•••</button>
         <Avatar label="BB" color="#2563eb" />
@@ -679,7 +666,6 @@ function pageTitle(page: Page) {
     people: "People Directory",
     prompts: "Prompt Library",
     search: "Smart Search",
-    settings: "Settings",
   };
 
   return map[page];
@@ -809,12 +795,6 @@ function ProjectsPage({
 }) {
   return (
     <div className="page">
-      <SectionTitle
-        title="All Projects"
-        description="Browse internal and client projects with owners, files, timelines, and reusable assets."
-        action="+ New Project"
-      />
-
       <div className="card-grid">
         {projects.map((project) => (
           <button
@@ -862,11 +842,6 @@ function ResearchPage({
 
   return (
     <div className="page">
-      <SectionTitle
-        title="R&D Knowledge Base"
-        description="Separate from projects: recently researched AI models, service models, experiments, and reusable research notes."
-        action="+ Add Research"
-      />
 
       <div className="research-columns">
         <ResearchColumn
@@ -927,11 +902,6 @@ function ResearchColumn({
 function PeoplePage() {
   return (
     <div className="page">
-      <SectionTitle
-        title="People Directory"
-        description="Find team members by role, skills, expertise, and projects they worked on."
-      />
-
       <div className="card-grid">
         {members.map((member) => (
           <div key={member.id} className="person-card">
@@ -963,11 +933,6 @@ function PeoplePage() {
 function PromptsPage() {
   return (
     <div className="page">
-      <SectionTitle
-        title="Prompt Library"
-        description="Reusable prompts for campaigns, proposals, research, reports, and meeting summaries."
-        action="+ New Prompt"
-      />
 
       <div className="card-grid">
         {prompts.map((prompt) => (
@@ -1002,11 +967,6 @@ function SearchPage({
 }) {
   return (
     <div className="page">
-      <SectionTitle
-        title="Smart Search"
-        description="Search across projects, people, files, prompts, research models, and service models."
-      />
-
       <div className="search-box">
         <span className="top-search-icon">⌕</span>
         <input
@@ -1049,41 +1009,6 @@ function SearchPage({
   );
 }
 
-function SettingsPage() {
-  return (
-    <div className="page">
-      <SectionTitle
-        title="Settings"
-        description="Workspace stats, access control, and configuration overview."
-      />
-
-      <div className="settings-stats">
-        <StatSimple value="377" label="Total documents" />
-        <StatSimple value="126" label="Active users" />
-        <StatSimple value="12" label="Projects" />
-        <StatSimple value="38" label="Research assets" />
-      </div>
-
-      <div className="panel">
-        <PanelHeader title="Access Overview" />
-        <div className="access-list">
-          <AccessRow label="Projects" value="12 projects" color="#2563eb" />
-          <AccessRow label="R&D and Models" value="38 assets" color="#7c3aed" />
-          <AccessRow
-            label="People Directory"
-            value="24 users"
-            color="#10b981"
-          />
-          <AccessRow
-            label="Prompt Library"
-            value="42 prompts"
-            color="#f59e0b"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function ProjectDetail({
   project,
