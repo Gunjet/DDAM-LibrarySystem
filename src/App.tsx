@@ -68,6 +68,7 @@ type PromptItem = {
   text: string;
 };
 
+
 const members: Member[] = [
   {
     id: 1,
@@ -404,6 +405,10 @@ const prompts: PromptItem[] = [
   },
 ];
 
+function cn(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(" ");
+}
+
 export default function App() {
   const [page, setPage] = useState<Page>("home");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -519,10 +524,10 @@ export default function App() {
   }, [query]);
 
   return (
-    <div className="app">
+    <div className="min-h-screen bg-white text-neutral-900 grid grid-cols-[280px_1fr] max-[1100px]:grid-cols-1">
       <Sidebar page={page} onPage={openPage} />
 
-      <main className="main">
+      <main className="min-w-0">
         <Header
           page={page}
           onSearch={() => openPage("search")}
@@ -599,35 +604,52 @@ function Sidebar({
     { id: "rnd", label: "R&D / Models", icon: "✦" },
     { id: "people", label: "People", icon: "●" },
     { id: "prompts", label: "Prompts", icon: "⌘" },
-    { id: "search", label: "Smart Search", icon: "⌕" },
+    { id: "search", label: "Search", icon: "⌕" },
   ];
 
   return (
-    <aside className="sidebar">
-      <div className="brand">
-        <div className="brand-icon">▤</div>
+    <aside className="min-h-screen max-[1100px]:min-h-0 border-r border-neutral-200 bg-neutral-50 px-[18px] py-7 flex flex-col">
+      <div className="h-[84px] flex items-center gap-3.5 px-2.5 pb-6 border-b border-neutral-200">
+        <div className="w-[54px] h-[54px] rounded-[17px] grid place-items-center text-white text-[26px] bg-gradient-to-br from-blue-600 to-violet-600">
+          ▤
+        </div>
         <div>
-          <h1>DDAM Library System</h1>
+          <h1 className="m-0 text-xl tracking-[-0.04em] font-bold">
+            DDAM Library System
+          </h1>
         </div>
       </div>
 
-      <nav className="nav">
-        {nav.map((item) => (
-          <button
-            key={item.id}
-            className={page === item.id ? "active" : ""}
-            onClick={() => onPage(item.id)}>
-            <span>{item.icon}</span>
-            {item.label}
-          </button>
-        ))}
+      <nav className="mt-5 flex flex-col gap-1.5">
+        {nav.map((item) => {
+          const active = page === item.id;
+
+          return (
+            <button
+              key={item.id}
+              className={cn(
+                "w-full h-[52px] rounded-xl border-0 bg-transparent text-neutral-700 flex items-center gap-3.5 px-3 text-[15px] font-semibold text-left hover:bg-white hover:shadow-sm",
+                active && "bg-white shadow-sm text-neutral-950",
+              )}
+              onClick={() => onPage(item.id)}>
+              <span
+                className={cn(
+                  "w-9 h-9 min-w-9 rounded-xl grid place-items-center bg-slate-100 text-slate-500 text-[22px] leading-none",
+                  active && "bg-blue-50 text-blue-600",
+                )}>
+                {item.icon}
+              </span>
+              {item.label}
+            </button>
+          );
+        })}
       </nav>
 
-      <div className="sidebar-profile">
+      <div className="mt-auto border-t border-neutral-200 pt-[18px] px-2.5 flex items-center gap-3">
         <Avatar label="BB" color="#2563eb" />
         <div>
-          <strong>Bold</strong>
-          <p>Workspace Admin</p>
+          <strong className="text-sm">Bold</strong>
+          <p className="m-0 mt-0.5 text-neutral-400 text-xs">Workspace Admin</p>
         </div>
       </div>
     </aside>
@@ -646,16 +668,20 @@ function Header({
   subtitleOverride?: string;
 }) {
   return (
-    <header className="topbar">
+    <header className="h-[92px] border-b border-neutral-200 grid grid-cols-[minmax(220px,1fr)_auto] items-center gap-6 px-[34px] bg-white/85 backdrop-blur sticky top-0 z-10 max-[1100px]:grid-cols-1 max-[1100px]:h-auto max-[1100px]:p-5">
       <div>
-        <p className="eyebrow">
+        <p className="m-0 mb-1 text-neutral-400 text-xs font-bold">
           {subtitleOverride || "DDAM Internal Platform"}
         </p>
-        <h2>{titleOverride || pageTitle(page)}</h2>
+        <h2 className="m-0 text-2xl tracking-[-0.045em] font-bold">
+          {titleOverride || pageTitle(page)}
+        </h2>
       </div>
 
-      <div className="top-actions">
-        <button className="icon-button">•••</button>
+      <div className="flex items-center justify-end gap-3.5">
+        <button className="border-0 bg-transparent text-neutral-400 font-black text-lg">
+          •••
+        </button>
         <Avatar label="BB" color="#2563eb" />
       </div>
     </header>
@@ -669,7 +695,7 @@ function pageTitle(page: Page) {
     rnd: "R&D and Models",
     people: "People Directory",
     prompts: "Prompt Library",
-    search: "Smart Search",
+    search: "Search",
   };
 
   return map[page];
@@ -689,8 +715,8 @@ function HomePage({
   );
 
   return (
-    <div className="page">
-      <section className="stats-grid">
+    <div className="max-w-[1120px] mx-auto px-[34px] pt-[42px] pb-[90px] max-[640px]:px-4 max-[640px]:pt-6">
+      <section className="grid grid-cols-4 gap-4 max-[1100px]:grid-cols-1">
         <StatCard
           label="Total Projects"
           value="12"
@@ -717,14 +743,14 @@ function HomePage({
         />
       </section>
 
-      <section className="two-column">
-        <div className="panel">
+      <section className="mt-[18px] grid grid-cols-[1.45fr_0.95fr] gap-[18px] max-[1100px]:grid-cols-1">
+        <Panel>
           <PanelHeader
             title="Active Projects"
             action="View all"
             onAction={onProjects}
           />
-          <div className="project-list">
+          <div className="flex flex-col">
             {activeProjects.map((project) => (
               <ProjectRow
                 key={project.id}
@@ -733,60 +759,68 @@ function HomePage({
               />
             ))}
           </div>
-        </div>
+        </Panel>
 
-        <div className="panel">
+        <Panel>
           <PanelHeader title="Team Members" action="Directory" />
-          <div className="member-list">
+          <div className="flex flex-col">
             {members.slice(0, 5).map((member) => (
               <MemberRow key={member.id} member={member} />
             ))}
           </div>
-        </div>
+        </Panel>
       </section>
 
-      <section className="quick-grid">
-        <button className="quick-card" onClick={onProjects}>
-          <h3>Project Library</h3>
-          <p>
+      <section className="mt-[18px] grid grid-cols-2 gap-[18px] max-[1100px]:grid-cols-1">
+        <button className="border border-neutral-200 bg-white rounded-[18px] p-[22px] text-left transition hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(16,24,40,0.06)] hover:border-neutral-300">
+          <h3 className="m-0 mb-2 text-lg tracking-[-0.03em] font-bold">
+            Project Library
+          </h3>
+          <p className="m-0 text-neutral-400 text-sm leading-6">
             Centralized project information, files, links, screenshots, and
             lessons learned.
           </p>
         </button>
 
-        <button className="quick-card" onClick={onResearch}>
-          <h3>R&D / Models</h3>
-          <p>
+        <button
+          className="border border-neutral-200 bg-white rounded-[18px] p-[22px] text-left transition hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(16,24,40,0.06)] hover:border-neutral-300"
+          onClick={onResearch}>
+          <h3 className="m-0 mb-2 text-lg tracking-[-0.03em] font-bold">
+            R&D / Models
+          </h3>
+          <p className="m-0 text-neutral-400 text-sm leading-6">
             Recently researched AI models, service models, experiments, and
             research notes.
           </p>
         </button>
       </section>
 
-      <section className="panel">
-        <PanelHeader title="Recent Activity" />
-        <div className="activity-grid">
-          <Activity
-            color="#2563eb"
-            title="Anna added a new FUJI dashboard file"
-            time="5 min ago"
-          />
-          <Activity
-            color="#f59e0b"
-            title="Dorj reviewed Viz Platform export flow"
-            time="32 min ago"
-          />
-          <Activity
-            color="#10b981"
-            title="Bolod updated Media Mix model results"
-            time="2h ago"
-          />
-          <Activity
-            color="#ec4899"
-            title="Tsend opened Retail Heatmap planning"
-            time="Yesterday"
-          />
-        </div>
+      <section className="mt-[18px]">
+        <Panel>
+          <PanelHeader title="Recent Activity" />
+          <div className="grid grid-cols-4 max-[1100px]:grid-cols-1">
+            <Activity
+              color="#2563eb"
+              title="Anna added a new FUJI dashboard file"
+              time="5 min ago"
+            />
+            <Activity
+              color="#f59e0b"
+              title="Dorj reviewed Viz Platform export flow"
+              time="32 min ago"
+            />
+            <Activity
+              color="#10b981"
+              title="Bolod updated Media Mix model results"
+              time="2h ago"
+            />
+            <Activity
+              color="#ec4899"
+              title="Tsend opened Retail Heatmap planning"
+              time="Yesterday"
+            />
+          </div>
+        </Panel>
       </section>
     </div>
   );
@@ -798,26 +832,32 @@ function ProjectsPage({
   onProject: (project: Project) => void;
 }) {
   return (
-    <div className="page">
-      <div className="card-grid">
+    <PageShell>
+      <div className="grid grid-cols-2 gap-[18px] max-[1100px]:grid-cols-1">
         {projects.map((project) => (
           <button
             key={project.id}
-            className="project-card"
+            className="border border-neutral-200 bg-white rounded-[18px] p-[22px] text-left text-neutral-900 transition hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(16,24,40,0.06)] hover:border-neutral-300"
             onClick={() => onProject(project)}>
-            <div className="card-head">
+            <div className="flex justify-between items-start gap-3.5">
               <div>
-                <h3>{project.name}</h3>
-                <p>{project.client}</p>
+                <h3 className="m-0 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+                  {project.name}
+                </h3>
+                <p className="m-0 text-neutral-400 text-[13px]">
+                  {project.client}
+                </p>
               </div>
               <StatusBadge status={project.status} />
             </div>
 
-            <p className="card-desc">{project.description}</p>
+            <p className="min-h-[60px] text-neutral-400 text-[13px] leading-6">
+              {project.description}
+            </p>
 
             <Progress value={project.progress} />
 
-            <div className="meta-row">
+            <div className="mt-3 flex flex-wrap gap-3 text-neutral-400 text-xs font-bold">
               <span>{project.progress}% complete</span>
               <span>{project.members.length} members</span>
               <span>{project.files.length} files</span>
@@ -827,7 +867,7 @@ function ProjectsPage({
           </button>
         ))}
       </div>
-    </div>
+    </PageShell>
   );
 }
 
@@ -845,8 +885,8 @@ function ResearchPage({
   const notes = researchItems.filter((item) => item.type === "Research Note");
 
   return (
-    <div className="page">
-      <div className="research-columns">
+    <PageShell>
+      <div className="grid grid-cols-3 gap-[18px] max-[1100px]:grid-cols-1">
         <ResearchColumn
           title="AI Models and Experiments"
           items={models}
@@ -863,7 +903,7 @@ function ResearchPage({
           onResearch={onResearch}
         />
       </div>
-    </div>
+    </PageShell>
   );
 }
 
@@ -877,79 +917,109 @@ function ResearchColumn({
   onResearch: (item: ResearchItem) => void;
 }) {
   return (
-    <div className="panel">
+    <Panel>
       <PanelHeader title={title} />
-      <div className="research-list">
+      <div className="flex flex-col">
         {items.map((item) => (
           <button
             key={item.id}
-            className="research-card"
+            className="w-full border-0 border-b border-neutral-200 bg-transparent p-[18px] text-left text-neutral-900 transition hover:bg-neutral-100 last:border-b-0"
             onClick={() => onResearch(item)}>
-            <div className="research-top">
-              <span>{item.type}</span>
-              <ResearchStatus status={item.status} />
+            <div className="flex justify-between items-start gap-3.5">
+              <span className="text-blue-600 text-[11px] font-black uppercase tracking-wide">
+                {item.type}
+              </span>
+              <ResearchStatusBadge status={item.status} />
             </div>
-            <h3>{item.title}</h3>
-            <p>{item.summary}</p>
+            <h3 className="m-0 mt-3 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+              {item.title}
+            </h3>
+            <p className="text-neutral-400 text-[13px] leading-6">
+              {item.summary}
+            </p>
             <TagList items={item.stack.slice(0, 3)} />
-            <small>
+            <small className="block mt-3 text-neutral-400 text-xs font-bold">
               {item.owner} · {item.updated}
             </small>
           </button>
         ))}
       </div>
-    </div>
+    </Panel>
   );
 }
 
 function PeoplePage() {
   return (
-    <div className="page">
-      <div className="card-grid">
+    <PageShell>
+      <div className="grid grid-cols-2 gap-[18px] max-[1100px]:grid-cols-1">
         {members.map((member) => (
-          <div key={member.id} className="person-card">
-            <div className="person-head">
+          <div
+            key={member.id}
+            className="border border-neutral-200 bg-white rounded-[18px] p-[22px] text-left">
+            <div className="flex items-center gap-3">
               <Avatar label={member.initials} color={member.color} />
               <div>
-                <h3>{member.name}</h3>
-                <p>{member.role}</p>
+                <h3 className="m-0 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+                  {member.name}
+                </h3>
+                <p className="m-0 text-neutral-400 text-[13px]">
+                  {member.role}
+                </p>
               </div>
             </div>
 
             <TagList items={member.skills} />
 
-            <div className="worked-on">
-              <strong>Projects worked on</strong>
+            <div className="mt-[18px]">
+              <strong className="block mb-2 text-xs text-neutral-500">
+                Projects worked on
+              </strong>
               {member.projects.map((project) => (
-                <p key={project}>• {project}</p>
+                <p key={project} className="my-1 text-neutral-400 text-[13px]">
+                  • {project}
+                </p>
               ))}
             </div>
 
-            <small>{member.email}</small>
+            <small className="block mt-3 text-neutral-400 text-xs font-bold">
+              {member.email}
+            </small>
           </div>
         ))}
       </div>
-    </div>
+    </PageShell>
   );
 }
 
 function PromptsPage() {
   return (
-    <div className="page">
-      <div className="card-grid">
+    <PageShell>
+      <div className="grid grid-cols-2 gap-[18px] max-[1100px]:grid-cols-1">
         {prompts.map((prompt) => (
-          <div key={prompt.id} className="prompt-card">
-            <div className="prompt-head">
-              <span>{prompt.category}</span>
-              <small>{prompt.owner}</small>
+          <div
+            key={prompt.id}
+            className="border border-neutral-200 bg-white rounded-[18px] p-[22px]">
+            <div className="flex justify-between items-start gap-3.5">
+              <span className="text-blue-600 text-[11px] font-black uppercase tracking-wide">
+                {prompt.category}
+              </span>
+              <small className="text-neutral-400 text-xs font-bold">
+                {prompt.owner}
+              </small>
             </div>
-            <h3>{prompt.title}</h3>
-            <p>{prompt.text}</p>
-            <button>Copy Prompt</button>
+            <h3 className="m-0 mt-3 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+              {prompt.title}
+            </h3>
+            <p className="min-h-[74px] text-neutral-400 text-[13px] leading-6">
+              {prompt.text}
+            </p>
+            <button className="w-full h-10 border border-neutral-200 bg-neutral-100 rounded-xl text-neutral-900 text-[13px] font-black hover:bg-white">
+              Copy Prompt
+            </button>
           </div>
         ))}
       </div>
-    </div>
+    </PageShell>
   );
 }
 
@@ -968,46 +1038,62 @@ function SearchPage({
   }[];
 }) {
   return (
-    <div className="page">
-      <div className="search-box">
-        <span className="top-search-icon">⌕</span>
+    <PageShell>
+      <div className="h-[62px] border border-neutral-200 bg-white rounded-[18px] shadow-[0_8px_28px_rgba(16,24,40,0.06)] flex items-center gap-3.5 px-[18px] text-neutral-400">
+        <span className="text-3xl">⌕</span>
         <input
           autoFocus
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder='Try: "Who worked on React dashboards?"'
+          className="flex-1 border-0 outline-0 text-neutral-900 text-base placeholder:text-neutral-400"
         />
-        <kbd>⌘K</kbd>
+        <kbd className="border border-neutral-200 bg-white text-neutral-400 rounded-md px-2 py-1 text-xs">
+          ⌘K
+        </kbd>
       </div>
 
-      <div className="search-examples">
-        <button onClick={() => setQuery("React dashboard")}>
-          React dashboard
-        </button>
-        <button onClick={() => setQuery("Media Mix")}>Media Mix</button>
-        <button onClick={() => setQuery("service model")}>Service model</button>
-        <button onClick={() => setQuery("campaign proposal")}>
-          Campaign proposal
-        </button>
+      <div className="my-4 flex flex-wrap gap-2.5">
+        {[
+          "React dashboard",
+          "Media Mix",
+          "service model",
+          "campaign proposal",
+        ].map((item) => (
+          <button
+            key={item}
+            onClick={() => setQuery(item)}
+            className="border border-neutral-200 bg-neutral-100 text-neutral-700 rounded-full px-3 py-2 text-xs font-bold">
+            {item}
+          </button>
+        ))}
       </div>
 
-      <div className="result-list">
+      <div className="flex flex-col gap-3">
         {query.trim() && results.length === 0 && (
-          <div className="empty-state">No results found for “{query}”</div>
+          <div className="border border-dashed border-neutral-300 rounded-[18px] p-11 text-center text-neutral-400">
+            No results found for “{query}”
+          </div>
         )}
 
         {results.map((result, index) => (
           <button
             key={`${result.type}-${result.title}-${index}`}
-            className="result-card"
+            className="w-full border border-neutral-200 bg-white rounded-[18px] p-[22px] text-left text-neutral-900 transition hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(16,24,40,0.06)] hover:border-neutral-300"
             onClick={result.action}>
-            <span>{result.type}</span>
-            <h3>{result.title}</h3>
-            <p>{result.description}</p>
+            <span className="text-blue-600 text-[11px] font-black uppercase tracking-wide">
+              {result.type}
+            </span>
+            <h3 className="m-0 mt-1.5 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+              {result.title}
+            </h3>
+            <p className="m-0 text-neutral-400 text-[13px] leading-6">
+              {result.description}
+            </p>
           </button>
         ))}
       </div>
-    </div>
+    </PageShell>
   );
 }
 
@@ -1019,41 +1105,55 @@ function ProjectDetail({
   onClose: () => void;
 }) {
   return (
-    <div className="page detail-page">
-      <button className="back-button" onClick={onClose}>
-        <span>←</span>
+    <div className="max-w-[1180px] mx-auto px-[34px] pt-[34px] pb-[90px] max-[640px]:px-4">
+      <button
+        className="h-10 border border-neutral-200 bg-white text-neutral-800 rounded-xl px-3.5 inline-flex items-center gap-2 text-[13px] font-black mb-[18px] hover:bg-neutral-100"
+        onClick={onClose}>
+        <span className="text-[17px]">←</span>
         Back to Projects
       </button>
 
-      <section className="detail-hero">
-        <div className="detail-hero-main">
-          <div className="detail-icon project-icon">▦</div>
+      <section className="border border-neutral-200 bg-white rounded-3xl p-6 grid grid-cols-[1fr_240px] gap-5 items-stretch shadow-[0_8px_28px_rgba(16,24,40,0.06)] mb-5 max-[1100px]:grid-cols-1">
+        <div className="flex gap-[18px] items-start max-[640px]:flex-col">
+          <div className="w-16 h-16 rounded-[20px] grid place-items-center text-[28px] shrink-0 border border-neutral-200 bg-blue-50 text-blue-600">
+            ▦
+          </div>
 
           <div>
-            <p className="eyebrow">Project Detail</p>
-            <h1>{project.name}</h1>
-            <p>{project.description}</p>
+            <p className="m-0 mb-1 text-neutral-400 text-xs font-bold">
+              Project Detail
+            </p>
+            <h1 className="m-0 mb-2 text-[32px] leading-tight tracking-[-0.06em] font-bold max-[640px]:text-[27px]">
+              {project.name}
+            </h1>
+            <p className="m-0 text-neutral-400 text-sm leading-6 max-w-[780px]">
+              {project.description}
+            </p>
 
-            <div className="detail-meta-pills">
-              <span>{project.client}</span>
-              <span>{project.timeline}</span>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <Pill>{project.client}</Pill>
+              <Pill>{project.timeline}</Pill>
               <StatusBadge status={project.status} />
             </div>
           </div>
         </div>
 
-        <div className="detail-progress-card">
-          <span>Overall Progress</span>
-          <strong>{project.progress}%</strong>
+        <div className="border border-neutral-200 bg-neutral-100 rounded-[20px] p-[18px] flex flex-col justify-center max-[1100px]:max-w-[360px]">
+          <span className="text-neutral-400 text-xs font-black uppercase tracking-wide">
+            Overall Progress
+          </span>
+          <strong className="block my-3 text-[34px] tracking-[-0.06em]">
+            {project.progress}%
+          </strong>
           <Progress value={project.progress} />
         </div>
       </section>
 
-      <div className="detail-layout">
-        <div className="detail-primary">
-          <div className="panel">
+      <div className="grid grid-cols-[minmax(0,1.35fr)_minmax(320px,0.85fr)] gap-5 items-start max-[1100px]:grid-cols-1">
+        <div className="flex flex-col gap-5">
+          <Panel>
             <PanelHeader title="Project Overview" />
-            <div className="info-grid">
+            <div className="grid grid-cols-2 max-[640px]:grid-cols-1">
               <Info label="Client" value={project.client} />
               <Info label="Status" value={project.status} />
               <Info label="Timeline" value={project.timeline} />
@@ -1061,114 +1161,150 @@ function ProjectDetail({
               <Info label="Goal" value={project.goal} wide />
               <Info label="Problem Solved" value={project.problemSolved} wide />
             </div>
-          </div>
+          </Panel>
 
-          <div className="panel">
+          <Panel>
             <PanelHeader title="Tasks" action="Add task" />
-            <div className="task-list">
+            <div className="flex flex-col">
               {project.tasks.map((task) => (
-                <div key={task.title} className="task-row">
+                <div
+                  key={task.title}
+                  className="min-h-[58px] grid grid-cols-[24px_1fr_auto_auto] gap-3 items-center border-b border-neutral-200 px-[18px] py-3.5 hover:bg-neutral-100 last:border-b-0 max-[640px]:grid-cols-[24px_1fr]">
                   <span
-                    className={`check ${task.status === "Done" ? "done" : ""}`}>
+                    className={cn(
+                      "w-5 h-5 border border-neutral-300 rounded-md grid place-items-center text-[11px] text-transparent",
+                      task.status === "Done" &&
+                        "bg-blue-600 border-blue-600 text-white",
+                    )}>
                     ✓
                   </span>
-                  <strong>{task.title}</strong>
-                  <small>{task.assignee}</small>
-                  <TaskStatus status={task.status} />
+                  <strong className="text-[13px]">{task.title}</strong>
+                  <small className="text-neutral-400 text-xs max-[640px]:col-start-2">
+                    {task.assignee}
+                  </small>
+                  <TaskStatusBadge status={task.status} />
                 </div>
               ))}
             </div>
-          </div>
+          </Panel>
 
-          <div className="panel files-panel">
-            <div className="files-panel-header">
+          <Panel>
+            <div className="min-h-[70px] border-b border-neutral-200 px-[18px] py-4 flex justify-between items-center gap-3.5">
               <div>
-                <h3>Files and Assets</h3>
-                <p>View, download, or share project materials.</p>
+                <h3 className="m-0 text-[13px] tracking-[0.08em] uppercase text-neutral-600 font-black">
+                  Files and Assets
+                </h3>
+                <p className="m-0 mt-1 text-neutral-400 text-xs">
+                  View, download, or share project materials.
+                </p>
               </div>
 
-              <button className="upload-button">+ Add file</button>
+              <button className="h-[38px] border border-neutral-200 bg-white text-neutral-900 rounded-xl px-3 text-xs font-black whitespace-nowrap hover:bg-neutral-100">
+                + Add file
+              </button>
             </div>
 
-            <div className="file-list">
+            <div className="flex flex-col">
               {project.files.map((file) => (
-                <div key={file.name} className="file-row enhanced-file-row">
-                  <span className={`file-type ${file.type.toLowerCase()}`}>
-                    {file.type}
-                  </span>
+                <div
+                  key={file.name}
+                  className="min-h-[72px] grid grid-cols-[42px_minmax(0,1fr)_auto] gap-3 items-center border-b border-neutral-200 px-[18px] py-3.5 hover:bg-neutral-100 last:border-b-0 max-[760px]:grid-cols-[42px_1fr]">
+                  <span className={fileTypeClass(file.type)}>{file.type}</span>
 
-                  <div className="file-main">
-                    <strong>{file.name}</strong>
-                    <p>
+                  <div className="min-w-0">
+                    <strong className="block text-[13px] truncate">
+                      {file.name}
+                    </strong>
+                    <p className="m-0 mt-1 text-neutral-400 text-xs">
                       Added by {file.owner} · {file.size}
                     </p>
                   </div>
 
-                  <div className="file-actions">
+                  <div className="flex items-center gap-2 max-[760px]:col-start-2 max-[760px]:flex-wrap">
                     <button
-                      className="disabled-file-action"
                       disabled
-                      title="Download is not available yet">
+                      className="h-[34px] border border-neutral-900 bg-neutral-900 text-white rounded-[10px] px-3 text-xs font-black disabled:opacity-60">
                       Download
                     </button>
-
-                    <button>Share</button>
+                    <button className="h-[34px] border border-neutral-200 bg-white text-neutral-700 rounded-[10px] px-3 text-xs font-black hover:bg-neutral-100">
+                      Share
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </Panel>
         </div>
 
-        <aside className="detail-secondary">
-          <div className="panel">
+        <aside className="flex flex-col gap-5">
+          <Panel>
             <PanelHeader title="Team" />
             {project.members.map((name) => {
-              const member = members.find((item) => item.name === name);
+              const member =
+                members.find((item) => item.name === name) ||
+                members.find((item) =>
+                  name.toLowerCase().includes(item.name.toLowerCase()),
+                );
+
               return member ? (
                 <MemberRow key={name} member={member} compact />
-              ) : null;
+              ) : (
+                <div
+                  key={name}
+                  className="border-b border-neutral-200 px-5 py-4 text-sm text-neutral-500 last:border-b-0">
+                  {name}
+                </div>
+              );
             })}
-          </div>
+          </Panel>
 
-          <div className="panel ai-panel">
+          <Panel>
             <PanelHeader title="AI Assistant" action="Project-aware" />
 
-            <div className="ai-bubble">
+            <div className="m-[18px] bg-slate-50 border border-slate-100 rounded-[14px] p-4 text-neutral-700 text-[13px] leading-6">
               I can summarize this project, find related files, explain
               progress, and prepare a client-ready update.
             </div>
 
-            <div className="ai-actions">
-              <button>Summarize</button>
-              <button>Find files</button>
-              <button>List risks</button>
-              <button>Create update</button>
+            <div className="px-[18px] pb-4 grid grid-cols-2 gap-2.5">
+              <AIButton>Summarize</AIButton>
+              <AIButton>Find files</AIButton>
+              <AIButton>List risks</AIButton>
+              <AIButton>Create update</AIButton>
             </div>
 
-            <div className="ai-input">
-              <input placeholder="Ask about this project..." />
-              <button>↑</button>
+            <div className="mx-[18px] mb-[18px] grid grid-cols-[1fr_40px] gap-2.5">
+              <input
+                placeholder="Ask about this project..."
+                className="h-10 border border-neutral-200 bg-white rounded-xl px-3 outline-0 text-[13px]"
+              />
+              <button className="h-10 border border-neutral-200 bg-white rounded-xl font-black">
+                ↑
+              </button>
             </div>
-          </div>
+          </Panel>
 
-          <div className="panel">
+          <Panel>
             <PanelHeader title="Lessons Learned" />
-            <div className="notes-list">
+            <div className="p-[18px]">
               {project.lessons.map((lesson) => (
-                <p key={lesson}>• {lesson}</p>
+                <p
+                  key={lesson}
+                  className="m-0 mb-2 text-neutral-700 text-[13px] leading-6">
+                  • {lesson}
+                </p>
               ))}
             </div>
-          </div>
+          </Panel>
 
-          <div className="panel">
+          <Panel>
             <PanelHeader title="Screenshots" />
-            <div className="screenshot-list">
+            <div className="p-[18px] flex flex-wrap gap-2">
               {project.screenshots.map((shot) => (
-                <span key={shot}>{shot}</span>
+                <Pill key={shot}>{shot}</Pill>
               ))}
             </div>
-          </div>
+          </Panel>
         </aside>
       </div>
     </div>
@@ -1183,73 +1319,128 @@ function ResearchDetail({
   onClose: () => void;
 }) {
   return (
-    <div className="page detail-page">
-      <button className="back-button" onClick={onClose}>
-        <span>←</span>
+    <div className="max-w-[1180px] mx-auto px-[34px] pt-[34px] pb-[90px] max-[640px]:px-4">
+      <button
+        className="h-10 border border-neutral-200 bg-white text-neutral-800 rounded-xl px-3.5 inline-flex items-center gap-2 text-[13px] font-black mb-[18px] hover:bg-neutral-100"
+        onClick={onClose}>
+        <span className="text-[17px]">←</span>
         Back to R&D
       </button>
 
-      <section className="detail-hero research-hero">
-        <div className="detail-hero-main">
-          <div className="detail-icon research-icon">✦</div>
+      <section className="border border-neutral-200 bg-white rounded-3xl p-6 shadow-[0_8px_28px_rgba(16,24,40,0.06)] mb-5">
+        <div className="flex gap-[18px] items-start max-[640px]:flex-col">
+          <div className="w-16 h-16 rounded-[20px] grid place-items-center text-[28px] shrink-0 border border-neutral-200 bg-violet-50 text-violet-600">
+            ✦
+          </div>
 
           <div>
-            <p className="eyebrow">R&D Detail</p>
-            <h1>{item.title}</h1>
-            <p>{item.summary}</p>
+            <p className="m-0 mb-1 text-neutral-400 text-xs font-bold">
+              R&D Detail
+            </p>
+            <h1 className="m-0 mb-2 text-[32px] leading-tight tracking-[-0.06em] font-bold max-[640px]:text-[27px]">
+              {item.title}
+            </h1>
+            <p className="m-0 text-neutral-400 text-sm leading-6 max-w-[780px]">
+              {item.summary}
+            </p>
 
-            <div className="detail-meta-pills">
-              <span>{item.type}</span>
-              <span>{item.owner}</span>
-              <span>{item.updated}</span>
-              <ResearchStatus status={item.status} />
+            <div className="flex flex-wrap gap-2 mt-4">
+              <Pill>{item.type}</Pill>
+              <Pill>{item.owner}</Pill>
+              <Pill>{item.updated}</Pill>
+              <ResearchStatusBadge status={item.status} />
             </div>
           </div>
         </div>
       </section>
 
-      <div className="detail-layout research-detail-layout">
-        <div className="panel">
+      <div className="grid grid-cols-2 gap-5 items-start max-[1100px]:grid-cols-1">
+        <Panel>
           <PanelHeader title="Research Information" />
-          <div className="info-grid">
+          <div className="grid grid-cols-2 max-[640px]:grid-cols-1">
             <Info label="Type" value={item.type} />
             <Info label="Status" value={item.status} />
             <Info label="Owner" value={item.owner} />
             <Info label="Updated" value={item.updated} />
             <Info label="Summary" value={item.summary} wide />
           </div>
-        </div>
+        </Panel>
 
-        <div className="panel">
+        <Panel>
           <PanelHeader title="Used In Projects" />
-          <div className="padded-tags">
+          <div className="p-[18px]">
             <TagList items={item.usedIn} />
           </div>
-        </div>
+        </Panel>
 
-        <div className="panel">
+        <Panel>
           <PanelHeader title="Methods and Stack" />
-          <div className="padded-tags">
+          <div className="p-[18px]">
             <TagList items={item.stack} />
           </div>
-        </div>
+        </Panel>
 
-        <div className="panel">
+        <Panel>
           <PanelHeader title="Related Assets" />
-          <div className="file-list">
+          <div className="flex flex-col">
             {item.assets.map((asset) => (
-              <div key={asset} className="file-row">
-                <span className="file-type link">DOC</span>
+              <div
+                key={asset}
+                className="min-h-[58px] grid grid-cols-[38px_1fr_auto] gap-3 items-center border-b border-neutral-200 px-[18px] py-3.5 hover:bg-neutral-100 last:border-b-0">
+                <span className="w-[38px] h-[34px] rounded-[11px] grid place-items-center text-[10px] font-black bg-blue-100 text-blue-700">
+                  DOC
+                </span>
                 <div>
-                  <strong>{asset}</strong>
-                  <p>R&D asset</p>
+                  <strong className="text-[13px]">{asset}</strong>
+                  <p className="m-0 mt-1 text-neutral-400 text-xs">R&D asset</p>
                 </div>
-                <small>Link</small>
+                <small className="text-neutral-400 text-xs">Link</small>
               </div>
             ))}
           </div>
-        </div>
+        </Panel>
       </div>
+    </div>
+  );
+}
+
+function PageShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="max-w-[1120px] mx-auto px-[34px] pt-[42px] pb-[90px] max-[640px]:px-4 max-[640px]:pt-6">
+      {children}
+    </div>
+  );
+}
+
+function Panel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-neutral-200 bg-white rounded-[18px] overflow-hidden">
+      {children}
+    </div>
+  );
+}
+
+function PanelHeader({
+  title,
+  action,
+  onAction,
+}: {
+  title: string;
+  action?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="min-h-[58px] border-b border-neutral-200 flex items-center justify-between px-5">
+      <h3 className="m-0 text-neutral-600 text-[13px] tracking-[0.08em] font-black uppercase">
+        {title}
+      </h3>
+      {action && (
+        <button
+          onClick={onAction}
+          className="border border-neutral-200 bg-white text-neutral-500 rounded-full px-3 py-1.5 text-xs font-bold hover:bg-neutral-100">
+          {action}
+        </button>
+      )}
     </div>
   );
 }
@@ -1265,57 +1456,26 @@ function StatCard({
   note: string;
   tone: "blue" | "green" | "orange" | "purple";
 }) {
-  return (
-    <div className={`stat-card ${tone}`}>
-      <p>{label}</p>
-      <h3>{value}</h3>
-      <span>{note}</span>
-    </div>
-  );
-}
+  const toneMap = {
+    blue: "bg-blue-600",
+    green: "bg-emerald-600",
+    orange: "bg-amber-600",
+    purple: "bg-violet-700",
+  };
 
-function StatSimple({ value, label }: { value: string; label: string }) {
   return (
-    <div className="stat-simple">
-      <h3>{value}</h3>
-      <p>{label}</p>
-    </div>
-  );
-}
-
-function PanelHeader({
-  title,
-  action,
-  onAction,
-}: {
-  title: string;
-  action?: string;
-  onAction?: () => void;
-}) {
-  return (
-    <div className="panel-header">
-      <h3>{title}</h3>
-      {action && <button onClick={onAction}>{action}</button>}
-    </div>
-  );
-}
-
-function SectionTitle({
-  title,
-  description,
-  action,
-}: {
-  title: string;
-  description: string;
-  action?: string;
-}) {
-  return (
-    <div className="section-title">
-      <div>
-        <h2>{title}</h2>
-        <p>{description}</p>
-      </div>
-      {action && <button className="primary-button">{action}</button>}
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-[20px] p-[22px] min-h-[126px] text-white shadow-[0_8px_28px_rgba(16,24,40,0.06)] after:content-[''] after:absolute after:-right-6 after:-top-6 after:w-[88px] after:h-[88px] after:rounded-full after:bg-white/15",
+        toneMap[tone],
+      )}>
+      <p className="m-0 text-xs font-black opacity-80 uppercase tracking-wide">
+        {label}
+      </p>
+      <h3 className="my-2 text-[34px] leading-none tracking-[-0.06em] font-bold">
+        {value}
+      </h3>
+      <span className="text-[13px] font-bold opacity-80">{note}</span>
     </div>
   );
 }
@@ -1328,18 +1488,23 @@ function ProjectRow({
   onClick: () => void;
 }) {
   return (
-    <button className="project-row" onClick={onClick}>
-      <span className="row-dot" />
-      <div className="row-main">
-        <strong>{project.name}</strong>
-        <p>
+    <button
+      className="w-full border-0 border-b border-neutral-200 bg-transparent px-5 py-[18px] grid grid-cols-[12px_1fr_170px_90px] gap-3.5 items-center text-left text-neutral-900 hover:bg-neutral-100 last:border-b-0 max-[1100px]:grid-cols-[12px_1fr]"
+      onClick={onClick}>
+      <span className="w-[9px] h-[9px] rounded-full bg-blue-600" />
+
+      <div>
+        <strong className="text-sm">{project.name}</strong>
+        <p className="m-0 mt-1 text-neutral-400 text-xs">
           {project.client} · {project.members.join(", ")}
         </p>
       </div>
-      <div className="row-progress">
+
+      <div className="grid grid-cols-[1fr_42px] items-center gap-2.5 max-[1100px]:col-start-2">
         <Progress value={project.progress} />
-        <b>{project.progress}%</b>
+        <b className="text-neutral-500 text-xs">{project.progress}%</b>
       </div>
+
       <StatusText status={project.status} />
     </button>
   );
@@ -1353,14 +1518,18 @@ function MemberRow({
   compact?: boolean;
 }) {
   return (
-    <div className={`member-row ${compact ? "compact" : ""}`}>
+    <div
+      className={cn(
+        "border-b border-neutral-200 px-5 py-4 grid gap-3 items-center hover:bg-neutral-100 last:border-b-0",
+        compact ? "grid-cols-[38px_1fr]" : "grid-cols-[38px_1fr_10px]",
+      )}>
       <Avatar label={member.initials} color={member.color} />
       <div>
-        <strong>{member.name}</strong>
-        <p>{member.role}</p>
+        <strong className="text-sm">{member.name}</strong>
+        <p className="m-0 mt-1 text-neutral-400 text-xs">{member.role}</p>
         {!compact && <TagList items={member.skills.slice(0, 2)} small />}
       </div>
-      {!compact && <span className="online-dot" />}
+      {!compact && <span className="w-2 h-2 bg-emerald-500 rounded-full" />}
     </div>
   );
 }
@@ -1375,17 +1544,22 @@ function Activity({
   time: string;
 }) {
   return (
-    <div className="activity-card">
-      <span style={{ backgroundColor: color }} />
-      <strong>{title}</strong>
-      <p>{time}</p>
+    <div className="min-h-[92px] p-[18px] border-r border-neutral-200 grid grid-cols-[4px_1fr] gap-3 last:border-r-0 max-[1100px]:border-r-0 max-[1100px]:border-b">
+      <span
+        className="row-span-2 w-1 rounded-full"
+        style={{ backgroundColor: color }}
+      />
+      <strong className="text-[13px] leading-5">{title}</strong>
+      <p className="m-0 text-neutral-400 text-xs">{time}</p>
     </div>
   );
 }
 
 function Avatar({ label, color }: { label: string; color: string }) {
   return (
-    <span className="avatar" style={{ backgroundColor: color }}>
+    <span
+      className="w-[38px] h-[38px] rounded-full inline-grid place-items-center text-white text-xs font-black shrink-0"
+      style={{ backgroundColor: color }}>
       {label}
     </span>
   );
@@ -1393,8 +1567,11 @@ function Avatar({ label, color }: { label: string; color: string }) {
 
 function Progress({ value }: { value: number }) {
   return (
-    <div className="progress">
-      <span style={{ width: `${value}%` }} />
+    <div className="h-1.5 rounded-full bg-neutral-200 overflow-hidden">
+      <span
+        className="h-full block rounded-full bg-gradient-to-r from-blue-600 to-violet-600"
+        style={{ width: `${value}%` }}
+      />
     </div>
   );
 }
@@ -1407,35 +1584,98 @@ function TagList({
   small?: boolean;
 }) {
   return (
-    <div className={`tag-list ${small ? "small" : ""}`}>
+    <div className="flex flex-wrap gap-2 mt-3">
       {items.map((item) => (
-        <span key={item}>{item}</span>
+        <span
+          key={item}
+          className={cn(
+            "border border-neutral-200 bg-neutral-100 text-neutral-700 rounded-full px-2.5 py-1.5 text-xs font-bold",
+            small && "px-2 py-1 text-[11px]",
+          )}>
+          {item}
+        </span>
       ))}
     </div>
   );
 }
 
-function StatusBadge({ status }: { status: ProjectStatus }) {
+function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <span className={`status-badge ${status.toLowerCase()}`}>{status}</span>
+    <span className="border border-neutral-200 bg-neutral-100 text-neutral-700 rounded-full px-3 py-1.5 text-xs font-bold">
+      {children}
+    </span>
+  );
+}
+
+function StatusBadge({ status }: { status: ProjectStatus }) {
+  const style =
+    status === "Planning"
+      ? "bg-amber-100 text-amber-800"
+      : status === "Done"
+        ? "bg-blue-100 text-blue-700"
+        : "bg-green-100 text-green-800";
+
+  return (
+    <span
+      className={cn(
+        "rounded-full px-2.5 py-1.5 text-[11px] font-black whitespace-nowrap",
+        style,
+      )}>
+      {status}
+    </span>
   );
 }
 
 function StatusText({ status }: { status: ProjectStatus }) {
+  const color =
+    status === "Planning"
+      ? "text-amber-600"
+      : status === "Done"
+        ? "text-blue-600"
+        : "text-emerald-600";
+
   return (
-    <span className={`status-text ${status.toLowerCase()}`}>{status}</span>
+    <span className={cn("text-xs font-black max-[1100px]:col-start-2", color)}>
+      {status}
+    </span>
   );
 }
 
-function ResearchStatus({ status }: { status: ResearchStatus }) {
+function ResearchStatusBadge({ status }: { status: ResearchStatus }) {
+  const style =
+    status === "Testing"
+      ? "bg-amber-100 text-amber-800"
+      : status === "Validated"
+        ? "bg-green-100 text-green-800"
+        : "bg-gray-100 text-gray-500";
+
   return (
-    <span className={`research-status ${status.toLowerCase()}`}>{status}</span>
+    <span
+      className={cn(
+        "rounded-full px-2.5 py-1.5 text-[11px] font-black whitespace-nowrap",
+        style,
+      )}>
+      {status}
+    </span>
   );
 }
 
-function TaskStatus({ status }: { status: Task["status"] }) {
+function TaskStatusBadge({ status }: { status: Task["status"] }) {
+  const style =
+    status === "Done"
+      ? "bg-green-100 text-green-800"
+      : status === "In Progress"
+        ? "bg-amber-100 text-amber-800"
+        : status === "Urgent"
+          ? "bg-rose-100 text-rose-700"
+          : "bg-gray-100 text-gray-500";
+
   return (
-    <span className={`task-status ${status.toLowerCase().replace(" ", "-")}`}>
+    <span
+      className={cn(
+        "rounded-full px-2.5 py-1.5 text-[11px] font-black whitespace-nowrap max-[640px]:col-start-2",
+        style,
+      )}>
       {status}
     </span>
   );
@@ -1451,29 +1691,39 @@ function Info({
   wide?: boolean;
 }) {
   return (
-    <div className={`info-box ${wide ? "wide" : ""}`}>
-      <span>{label}</span>
-      <strong>{value}</strong>
+    <div
+      className={cn(
+        "border-r border-b border-neutral-200 p-[18px]",
+        wide && "col-span-2 max-[640px]:col-span-1",
+      )}>
+      <span className="block mb-2 text-neutral-400 text-[11px] uppercase tracking-[0.08em] font-black">
+        {label}
+      </span>
+      <strong className="text-[13px] leading-6">{value}</strong>
     </div>
   );
 }
 
-function AccessRow({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: string;
-  color: string;
-}) {
+function AIButton({ children }: { children: React.ReactNode }) {
   return (
-    <div className="access-row">
-      <div>
-        <span style={{ backgroundColor: color }} />
-        <strong>{label}</strong>
-      </div>
-      <p>{value}</p>
-    </div>
+    <button className="h-10 border border-neutral-200 bg-white text-neutral-900 rounded-xl text-xs font-black hover:bg-neutral-100">
+      {children}
+    </button>
   );
+}
+
+function fileTypeClass(type: FileAsset["type"]) {
+  const base =
+    "w-[38px] h-[34px] rounded-[11px] grid place-items-center text-[10px] font-black";
+
+  const map: Record<FileAsset["type"], string> = {
+    XL: "bg-green-100 text-green-800",
+    PP: "bg-amber-100 text-amber-800",
+    WD: "bg-blue-100 text-blue-700",
+    PDF: "bg-rose-100 text-rose-700",
+    FIG: "bg-violet-100 text-violet-700",
+    LINK: "bg-blue-100 text-blue-700",
+  };
+
+  return cn(base, map[type]);
 }
