@@ -609,13 +609,13 @@ function Sidebar({
   return (
     <aside className="sticky top-0 h-screen max-h-screen overflow-hidden border-r border-neutral-200 bg-neutral-50 px-[18px] py-7 flex flex-col max-[1100px]:static max-[1100px]:h-auto max-[1100px]:max-h-none">
       <div className="shrink-0 h-[84px] flex items-center gap-3.5 px-2.5 pb-6 border-b border-neutral-200">
-        <div className="w-[54px] h-[54px] rounded-[17px] grid place-items-center text-white text-[26px] bg-gradient-to-br from-blue-600 to-violet-600">
+        <div className="w-[44px] h-[44px] rounded-[17px] grid place-items-center text-white text-[26px] bg-gradient-to-br from-blue-600 to-violet-600">
           ▤
         </div>
 
         <div>
-          <h1 className="m-0 text-[19px] tracking-[-0.035em] font-semibold text-neutral-900">
-            DDAM Library System
+          <h1 className="m-0 text-[15px] tracking-[-0.035em] font-semibold text-neutral-900">
+            DDAM Library <br></br>System
           </h1>
         </div>
       </div>
@@ -676,7 +676,7 @@ function Header({
         <p className="m-0 mb-1 text-neutral-400 text-xs font-medium tracking-wide">
           {subtitleOverride || "DDAM Internal Platform"}
         </p>
-        <h2 className="m-0 text-[25px] tracking-[-0.045em] font-semibold text-neutral-900">
+        <h2 className="m-0 text-[20px] tracking-[-0.045em] font-semibold text-neutral-900">
           {titleOverride || pageTitle(page)}
         </h2>
       </div>
