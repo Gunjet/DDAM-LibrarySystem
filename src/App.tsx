@@ -68,7 +68,6 @@ type PromptItem = {
   text: string;
 };
 
-
 const members: Member[] = [
   {
     id: 1,
@@ -524,7 +523,7 @@ export default function App() {
   }, [query]);
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 grid grid-cols-[280px_1fr] max-[1100px]:grid-cols-1">
+    <div className="min-h-screen bg-white text-neutral-800 antialiased font-sans tracking-[-0.01em] grid grid-cols-[280px_1fr] max-[1100px]:grid-cols-1">
       <Sidebar page={page} onPage={openPage} />
 
       <main className="min-w-0">
@@ -615,7 +614,7 @@ function Sidebar({
         </div>
 
         <div>
-          <h1 className="m-0 text-xl tracking-[-0.04em] font-bold">
+          <h1 className="m-0 text-[19px] tracking-[-0.035em] font-semibold text-neutral-900">
             DDAM Library System
           </h1>
         </div>
@@ -629,17 +628,15 @@ function Sidebar({
             <button
               key={item.id}
               className={cn(
-                "w-full h-[52px] rounded-xl border-0 bg-transparent text-neutral-700 flex items-center gap-3.5 px-3 text-[15px] font-semibold text-left hover:bg-white hover:shadow-sm",
+                "w-full h-[52px] rounded-xl border-0 bg-transparent text-neutral-700 flex items-center gap-3.5 px-3 text-[15px] font-medium text-left hover:bg-white hover:shadow-sm",
                 active && "bg-white shadow-sm text-neutral-950",
               )}
-              onClick={() => onPage(item.id)}
-            >
+              onClick={() => onPage(item.id)}>
               <span
                 className={cn(
                   "w-9 h-9 min-w-9 rounded-xl grid place-items-center bg-slate-100 text-slate-500 text-[22px] leading-none",
                   active && "bg-blue-50 text-blue-600",
-                )}
-              >
+                )}>
                 {item.icon}
               </span>
               {item.label}
@@ -676,16 +673,16 @@ function Header({
   return (
     <header className="h-[92px] border-b border-neutral-200 grid grid-cols-[minmax(220px,1fr)_auto] items-center gap-6 px-[34px] bg-white/85 backdrop-blur sticky top-0 z-10 max-[1100px]:grid-cols-1 max-[1100px]:h-auto max-[1100px]:p-5">
       <div>
-        <p className="m-0 mb-1 text-neutral-400 text-xs font-bold">
+        <p className="m-0 mb-1 text-neutral-400 text-xs font-medium tracking-wide">
           {subtitleOverride || "DDAM Internal Platform"}
         </p>
-        <h2 className="m-0 text-2xl tracking-[-0.045em] font-bold">
+        <h2 className="m-0 text-[25px] tracking-[-0.045em] font-semibold text-neutral-900">
           {titleOverride || pageTitle(page)}
         </h2>
       </div>
 
       <div className="flex items-center justify-end gap-3.5">
-        <button className="border-0 bg-transparent text-neutral-400 font-black text-lg">
+        <button className="border-0 bg-transparent text-neutral-400 font-semibold text-lg">
           •••
         </button>
         <Avatar label="BB" color="#2563eb" />
@@ -779,7 +776,7 @@ function HomePage({
 
       <section className="mt-[18px] grid grid-cols-2 gap-[18px] max-[1100px]:grid-cols-1">
         <button className="border border-neutral-200 bg-white rounded-[18px] p-[22px] text-left transition hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(16,24,40,0.06)] hover:border-neutral-300">
-          <h3 className="m-0 mb-2 text-lg tracking-[-0.03em] font-bold">
+          <h3 className="m-0 mb-2 text-lg tracking-[-0.03em] font-medium">
             Project Library
           </h3>
           <p className="m-0 text-neutral-400 text-sm leading-6">
@@ -791,7 +788,7 @@ function HomePage({
         <button
           className="border border-neutral-200 bg-white rounded-[18px] p-[22px] text-left transition hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(16,24,40,0.06)] hover:border-neutral-300"
           onClick={onResearch}>
-          <h3 className="m-0 mb-2 text-lg tracking-[-0.03em] font-bold">
+          <h3 className="m-0 mb-2 text-lg tracking-[-0.03em] font-medium">
             R&D / Models
           </h3>
           <p className="m-0 text-neutral-400 text-sm leading-6">
@@ -847,7 +844,7 @@ function ProjectsPage({
             onClick={() => onProject(project)}>
             <div className="flex justify-between items-start gap-3.5">
               <div>
-                <h3 className="m-0 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+                <h3 className="m-0 mb-1.5 text-[17px] tracking-[-0.025em] font-medium">
                   {project.name}
                 </h3>
                 <p className="m-0 text-neutral-400 text-[13px]">
@@ -863,7 +860,7 @@ function ProjectsPage({
 
             <Progress value={project.progress} />
 
-            <div className="mt-3 flex flex-wrap gap-3 text-neutral-400 text-xs font-bold">
+            <div className="mt-3 flex flex-wrap gap-3 text-neutral-400 text-xs font-medium">
               <span>{project.progress}% complete</span>
               <span>{project.members.length} members</span>
               <span>{project.files.length} files</span>
@@ -932,19 +929,19 @@ function ResearchColumn({
             className="w-full border-0 border-b border-neutral-200 bg-transparent p-[18px] text-left text-neutral-900 transition hover:bg-neutral-100 last:border-b-0"
             onClick={() => onResearch(item)}>
             <div className="flex justify-between items-start gap-3.5">
-              <span className="text-blue-600 text-[11px] font-black uppercase tracking-wide">
+              <span className="text-blue-600 text-[11px] font-semibold uppercase tracking-wide">
                 {item.type}
               </span>
               <ResearchStatusBadge status={item.status} />
             </div>
-            <h3 className="m-0 mt-3 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+            <h3 className="m-0 mt-3 mb-1.5 text-[17px] tracking-[-0.025em] font-medium">
               {item.title}
             </h3>
             <p className="text-neutral-400 text-[13px] leading-6">
               {item.summary}
             </p>
             <TagList items={item.stack.slice(0, 3)} />
-            <small className="block mt-3 text-neutral-400 text-xs font-bold">
+            <small className="block mt-3 text-neutral-400 text-xs font-medium">
               {item.owner} · {item.updated}
             </small>
           </button>
@@ -965,7 +962,7 @@ function PeoplePage() {
             <div className="flex items-center gap-3">
               <Avatar label={member.initials} color={member.color} />
               <div>
-                <h3 className="m-0 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+                <h3 className="m-0 mb-1.5 text-[17px] tracking-[-0.025em] font-medium">
                   {member.name}
                 </h3>
                 <p className="m-0 text-neutral-400 text-[13px]">
@@ -987,7 +984,7 @@ function PeoplePage() {
               ))}
             </div>
 
-            <small className="block mt-3 text-neutral-400 text-xs font-bold">
+            <small className="block mt-3 text-neutral-400 text-xs font-medium">
               {member.email}
             </small>
           </div>
@@ -1006,20 +1003,20 @@ function PromptsPage() {
             key={prompt.id}
             className="border border-neutral-200 bg-white rounded-[18px] p-[22px]">
             <div className="flex justify-between items-start gap-3.5">
-              <span className="text-blue-600 text-[11px] font-black uppercase tracking-wide">
+              <span className="text-blue-600 text-[11px] font-semibold uppercase tracking-wide">
                 {prompt.category}
               </span>
-              <small className="text-neutral-400 text-xs font-bold">
+              <small className="text-neutral-400 text-xs font-medium">
                 {prompt.owner}
               </small>
             </div>
-            <h3 className="m-0 mt-3 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+            <h3 className="m-0 mt-3 mb-1.5 text-[17px] tracking-[-0.025em] font-medium">
               {prompt.title}
             </h3>
             <p className="min-h-[74px] text-neutral-400 text-[13px] leading-6">
               {prompt.text}
             </p>
-            <button className="w-full h-10 border border-neutral-200 bg-neutral-100 rounded-xl text-neutral-900 text-[13px] font-black hover:bg-white">
+            <button className="w-full h-10 border border-neutral-200 bg-neutral-100 rounded-xl text-neutral-900 text-[13px] font-semibold hover:bg-white">
               Copy Prompt
             </button>
           </div>
@@ -1069,7 +1066,7 @@ function SearchPage({
           <button
             key={item}
             onClick={() => setQuery(item)}
-            className="border border-neutral-200 bg-neutral-100 text-neutral-700 rounded-full px-3 py-2 text-xs font-bold">
+            className="border border-neutral-200 bg-neutral-100 text-neutral-700 rounded-full px-3 py-2 text-xs font-medium">
             {item}
           </button>
         ))}
@@ -1087,10 +1084,10 @@ function SearchPage({
             key={`${result.type}-${result.title}-${index}`}
             className="w-full border border-neutral-200 bg-white rounded-[18px] p-[22px] text-left text-neutral-900 transition hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(16,24,40,0.06)] hover:border-neutral-300"
             onClick={result.action}>
-            <span className="text-blue-600 text-[11px] font-black uppercase tracking-wide">
+            <span className="text-blue-600 text-[11px] font-semibold uppercase tracking-wide">
               {result.type}
             </span>
-            <h3 className="m-0 mt-1.5 mb-1.5 text-[17px] tracking-[-0.025em] font-bold">
+            <h3 className="m-0 mt-1.5 mb-1.5 text-[17px] tracking-[-0.025em] font-medium">
               {result.title}
             </h3>
             <p className="m-0 text-neutral-400 text-[13px] leading-6">
@@ -1113,7 +1110,7 @@ function ProjectDetail({
   return (
     <div className="max-w-[1180px] mx-auto px-[34px] pt-[34px] pb-[90px] max-[640px]:px-4">
       <button
-        className="h-10 border border-neutral-200 bg-white text-neutral-800 rounded-xl px-3.5 inline-flex items-center gap-2 text-[13px] font-black mb-[18px] hover:bg-neutral-100"
+        className="h-10 border border-neutral-200 bg-white text-neutral-800 rounded-xl px-3.5 inline-flex items-center gap-2 text-[13px] font-semibold mb-[18px] hover:bg-neutral-100"
         onClick={onClose}>
         <span className="text-[17px]">←</span>
         Back to Projects
@@ -1126,10 +1123,10 @@ function ProjectDetail({
           </div>
 
           <div>
-            <p className="m-0 mb-1 text-neutral-400 text-xs font-bold">
+            <p className="m-0 mb-1 text-neutral-400 text-xs font-medium">
               Project Detail
             </p>
-            <h1 className="m-0 mb-2 text-[32px] leading-tight tracking-[-0.06em] font-bold max-[640px]:text-[27px]">
+            <h1 className="m-0 mb-2 text-[32px] leading-tight tracking-[-0.06em] font-medium max-[640px]:text-[27px]">
               {project.name}
             </h1>
             <p className="m-0 text-neutral-400 text-sm leading-6 max-w-[780px]">
@@ -1145,7 +1142,7 @@ function ProjectDetail({
         </div>
 
         <div className="border border-neutral-200 bg-neutral-100 rounded-[20px] p-[18px] flex flex-col justify-center max-[1100px]:max-w-[360px]">
-          <span className="text-neutral-400 text-xs font-black uppercase tracking-wide">
+          <span className="text-neutral-400 text-xs font-semibold uppercase tracking-wide">
             Overall Progress
           </span>
           <strong className="block my-3 text-[34px] tracking-[-0.06em]">
@@ -1197,7 +1194,7 @@ function ProjectDetail({
           <Panel>
             <div className="min-h-[70px] border-b border-neutral-200 px-[18px] py-4 flex justify-between items-center gap-3.5">
               <div>
-                <h3 className="m-0 text-[13px] tracking-[0.08em] uppercase text-neutral-600 font-black">
+                <h3 className="m-0 text-[13px] tracking-[0.08em] uppercase text-neutral-600 font-semibold">
                   Files and Assets
                 </h3>
                 <p className="m-0 mt-1 text-neutral-400 text-xs">
@@ -1205,7 +1202,7 @@ function ProjectDetail({
                 </p>
               </div>
 
-              <button className="h-[38px] border border-neutral-200 bg-white text-neutral-900 rounded-xl px-3 text-xs font-black whitespace-nowrap hover:bg-neutral-100">
+              <button className="h-[38px] border border-neutral-200 bg-white text-neutral-900 rounded-xl px-3 text-xs font-semibold whitespace-nowrap hover:bg-neutral-100">
                 + Add file
               </button>
             </div>
@@ -1229,10 +1226,10 @@ function ProjectDetail({
                   <div className="flex items-center gap-2 max-[760px]:col-start-2 max-[760px]:flex-wrap">
                     <button
                       disabled
-                      className="h-[34px] border border-neutral-900 bg-neutral-900 text-white rounded-[10px] px-3 text-xs font-black disabled:opacity-60">
+                      className="h-[34px] border border-neutral-900 bg-neutral-900 text-white rounded-[10px] px-3 text-xs font-semibold disabled:opacity-60">
                       Download
                     </button>
-                    <button className="h-[34px] border border-neutral-200 bg-white text-neutral-700 rounded-[10px] px-3 text-xs font-black hover:bg-neutral-100">
+                    <button className="h-[34px] border border-neutral-200 bg-white text-neutral-700 rounded-[10px] px-3 text-xs font-semibold hover:bg-neutral-100">
                       Share
                     </button>
                   </div>
@@ -1284,7 +1281,7 @@ function ProjectDetail({
                 placeholder="Ask about this project..."
                 className="h-10 border border-neutral-200 bg-white rounded-xl px-3 outline-0 text-[13px]"
               />
-              <button className="h-10 border border-neutral-200 bg-white rounded-xl font-black">
+              <button className="h-10 border border-neutral-200 bg-white rounded-xl font-semibold">
                 ↑
               </button>
             </div>
@@ -1327,7 +1324,7 @@ function ResearchDetail({
   return (
     <div className="max-w-[1180px] mx-auto px-[34px] pt-[34px] pb-[90px] max-[640px]:px-4">
       <button
-        className="h-10 border border-neutral-200 bg-white text-neutral-800 rounded-xl px-3.5 inline-flex items-center gap-2 text-[13px] font-black mb-[18px] hover:bg-neutral-100"
+        className="h-10 border border-neutral-200 bg-white text-neutral-800 rounded-xl px-3.5 inline-flex items-center gap-2 text-[13px] font-semibold mb-[18px] hover:bg-neutral-100"
         onClick={onClose}>
         <span className="text-[17px]">←</span>
         Back to R&D
@@ -1340,10 +1337,10 @@ function ResearchDetail({
           </div>
 
           <div>
-            <p className="m-0 mb-1 text-neutral-400 text-xs font-bold">
+            <p className="m-0 mb-1 text-neutral-400 text-xs font-medium">
               R&D Detail
             </p>
-            <h1 className="m-0 mb-2 text-[32px] leading-tight tracking-[-0.06em] font-bold max-[640px]:text-[27px]">
+            <h1 className="m-0 mb-2 text-[32px] leading-tight tracking-[-0.06em] font-medium max-[640px]:text-[27px]">
               {item.title}
             </h1>
             <p className="m-0 text-neutral-400 text-sm leading-6 max-w-[780px]">
@@ -1393,7 +1390,7 @@ function ResearchDetail({
               <div
                 key={asset}
                 className="min-h-[58px] grid grid-cols-[38px_1fr_auto] gap-3 items-center border-b border-neutral-200 px-[18px] py-3.5 hover:bg-neutral-100 last:border-b-0">
-                <span className="w-[38px] h-[34px] rounded-[11px] grid place-items-center text-[10px] font-black bg-blue-100 text-blue-700">
+                <span className="w-[38px] h-[34px] rounded-[11px] grid place-items-center text-[10px] font-semibold bg-blue-100 text-blue-700">
                   DOC
                 </span>
                 <div>
@@ -1437,13 +1434,13 @@ function PanelHeader({
 }) {
   return (
     <div className="min-h-[58px] border-b border-neutral-200 flex items-center justify-between px-5">
-      <h3 className="m-0 text-neutral-600 text-[13px] tracking-[0.08em] font-black uppercase">
+      <h3 className="m-0 text-neutral-600 text-[13px] tracking-[0.08em] font-semibold uppercase">
         {title}
       </h3>
       {action && (
         <button
           onClick={onAction}
-          className="border border-neutral-200 bg-white text-neutral-500 rounded-full px-3 py-1.5 text-xs font-bold hover:bg-neutral-100">
+          className="border border-neutral-200 bg-white text-neutral-500 rounded-full px-3 py-1.5 text-xs font-medium hover:bg-neutral-100">
           {action}
         </button>
       )}
@@ -1475,13 +1472,13 @@ function StatCard({
         "relative overflow-hidden rounded-[20px] p-[22px] min-h-[126px] text-white shadow-[0_8px_28px_rgba(16,24,40,0.06)] after:content-[''] after:absolute after:-right-6 after:-top-6 after:w-[88px] after:h-[88px] after:rounded-full after:bg-white/15",
         toneMap[tone],
       )}>
-      <p className="m-0 text-xs font-black opacity-80 uppercase tracking-wide">
+      <p className="m-0 text-xs font-semibold opacity-80 uppercase tracking-wide">
         {label}
       </p>
-      <h3 className="my-2 text-[34px] leading-none tracking-[-0.06em] font-bold">
+      <h3 className="my-2 text-[34px] leading-none tracking-[-0.06em] font-medium">
         {value}
       </h3>
-      <span className="text-[13px] font-bold opacity-80">{note}</span>
+      <span className="text-[13px] font-medium opacity-80">{note}</span>
     </div>
   );
 }
@@ -1564,7 +1561,7 @@ function Activity({
 function Avatar({ label, color }: { label: string; color: string }) {
   return (
     <span
-      className="w-[38px] h-[38px] rounded-full inline-grid place-items-center text-white text-xs font-black shrink-0"
+      className="w-[38px] h-[38px] rounded-full inline-grid place-items-center text-white text-xs font-semibold shrink-0"
       style={{ backgroundColor: color }}>
       {label}
     </span>
@@ -1595,7 +1592,7 @@ function TagList({
         <span
           key={item}
           className={cn(
-            "border border-neutral-200 bg-neutral-100 text-neutral-700 rounded-full px-2.5 py-1.5 text-xs font-bold",
+            "border border-neutral-200 bg-neutral-100 text-neutral-700 rounded-full px-2.5 py-1.5 text-xs font-medium",
             small && "px-2 py-1 text-[11px]",
           )}>
           {item}
@@ -1607,7 +1604,7 @@ function TagList({
 
 function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <span className="border border-neutral-200 bg-neutral-100 text-neutral-700 rounded-full px-3 py-1.5 text-xs font-bold">
+    <span className="border border-neutral-200 bg-neutral-100 text-neutral-700 rounded-full px-3 py-1.5 text-xs font-medium">
       {children}
     </span>
   );
@@ -1624,7 +1621,7 @@ function StatusBadge({ status }: { status: ProjectStatus }) {
   return (
     <span
       className={cn(
-        "rounded-full px-2.5 py-1.5 text-[11px] font-black whitespace-nowrap",
+        "rounded-full px-2.5 py-1.5 text-[11px] font-semibold whitespace-nowrap",
         style,
       )}>
       {status}
@@ -1641,7 +1638,8 @@ function StatusText({ status }: { status: ProjectStatus }) {
         : "text-emerald-600";
 
   return (
-    <span className={cn("text-xs font-black max-[1100px]:col-start-2", color)}>
+    <span
+      className={cn("text-xs font-semibold max-[1100px]:col-start-2", color)}>
       {status}
     </span>
   );
@@ -1658,7 +1656,7 @@ function ResearchStatusBadge({ status }: { status: ResearchStatus }) {
   return (
     <span
       className={cn(
-        "rounded-full px-2.5 py-1.5 text-[11px] font-black whitespace-nowrap",
+        "rounded-full px-2.5 py-1.5 text-[11px] font-semibold whitespace-nowrap",
         style,
       )}>
       {status}
@@ -1679,7 +1677,7 @@ function TaskStatusBadge({ status }: { status: Task["status"] }) {
   return (
     <span
       className={cn(
-        "rounded-full px-2.5 py-1.5 text-[11px] font-black whitespace-nowrap max-[640px]:col-start-2",
+        "rounded-full px-2.5 py-1.5 text-[11px] font-semibold whitespace-nowrap max-[640px]:col-start-2",
         style,
       )}>
       {status}
@@ -1702,7 +1700,7 @@ function Info({
         "border-r border-b border-neutral-200 p-[18px]",
         wide && "col-span-2 max-[640px]:col-span-1",
       )}>
-      <span className="block mb-2 text-neutral-400 text-[11px] uppercase tracking-[0.08em] font-black">
+      <span className="block mb-2 text-neutral-400 text-[11px] uppercase tracking-[0.08em] font-semibold">
         {label}
       </span>
       <strong className="text-[13px] leading-6">{value}</strong>
@@ -1712,7 +1710,7 @@ function Info({
 
 function AIButton({ children }: { children: React.ReactNode }) {
   return (
-    <button className="h-10 border border-neutral-200 bg-white text-neutral-900 rounded-xl text-xs font-black hover:bg-neutral-100">
+    <button className="h-10 border border-neutral-200 bg-white text-neutral-900 rounded-xl text-xs font-semibold hover:bg-neutral-100">
       {children}
     </button>
   );
@@ -1720,7 +1718,7 @@ function AIButton({ children }: { children: React.ReactNode }) {
 
 function fileTypeClass(type: FileAsset["type"]) {
   const base =
-    "w-[38px] h-[34px] rounded-[11px] grid place-items-center text-[10px] font-black";
+    "w-[38px] h-[34px] rounded-[11px] grid place-items-center text-[10px] font-semibold";
 
   const map: Record<FileAsset["type"], string> = {
     XL: "bg-green-100 text-green-800",
