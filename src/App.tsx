@@ -608,11 +608,12 @@ function Sidebar({
   ];
 
   return (
-    <aside className="min-h-screen max-[1100px]:min-h-0 border-r border-neutral-200 bg-neutral-50 px-[18px] py-7 flex flex-col">
-      <div className="h-[84px] flex items-center gap-3.5 px-2.5 pb-6 border-b border-neutral-200">
+    <aside className="sticky top-0 h-screen max-h-screen overflow-hidden border-r border-neutral-200 bg-neutral-50 px-[18px] py-7 flex flex-col max-[1100px]:static max-[1100px]:h-auto max-[1100px]:max-h-none">
+      <div className="shrink-0 h-[84px] flex items-center gap-3.5 px-2.5 pb-6 border-b border-neutral-200">
         <div className="w-[54px] h-[54px] rounded-[17px] grid place-items-center text-white text-[26px] bg-gradient-to-br from-blue-600 to-violet-600">
           ▤
         </div>
+
         <div>
           <h1 className="m-0 text-xl tracking-[-0.04em] font-bold">
             DDAM Library System
@@ -620,7 +621,7 @@ function Sidebar({
         </div>
       </div>
 
-      <nav className="mt-5 flex flex-col gap-1.5">
+      <nav className="mt-5 flex-1 overflow-y-auto pr-1 pb-4 flex flex-col gap-1.5">
         {nav.map((item) => {
           const active = page === item.id;
 
@@ -631,12 +632,14 @@ function Sidebar({
                 "w-full h-[52px] rounded-xl border-0 bg-transparent text-neutral-700 flex items-center gap-3.5 px-3 text-[15px] font-semibold text-left hover:bg-white hover:shadow-sm",
                 active && "bg-white shadow-sm text-neutral-950",
               )}
-              onClick={() => onPage(item.id)}>
+              onClick={() => onPage(item.id)}
+            >
               <span
                 className={cn(
                   "w-9 h-9 min-w-9 rounded-xl grid place-items-center bg-slate-100 text-slate-500 text-[22px] leading-none",
                   active && "bg-blue-50 text-blue-600",
-                )}>
+                )}
+              >
                 {item.icon}
               </span>
               {item.label}
@@ -645,11 +648,14 @@ function Sidebar({
         })}
       </nav>
 
-      <div className="mt-auto border-t border-neutral-200 pt-[18px] px-2.5 flex items-center gap-3">
+      <div className="shrink-0 mt-0 border-t border-neutral-200 pt-[18px] px-2.5 flex items-center gap-3 bg-neutral-50">
         <Avatar label="BB" color="#2563eb" />
-        <div>
-          <strong className="text-sm">Bold</strong>
-          <p className="m-0 mt-0.5 text-neutral-400 text-xs">Workspace Admin</p>
+
+        <div className="min-w-0">
+          <strong className="block text-sm truncate">Bold</strong>
+          <p className="m-0 mt-0.5 text-neutral-400 text-xs truncate">
+            Workspace Admin
+          </p>
         </div>
       </div>
     </aside>
