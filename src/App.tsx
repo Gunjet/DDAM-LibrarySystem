@@ -608,7 +608,7 @@ function Sidebar({
 
   return (
     <aside className="sticky top-0 h-screen max-h-screen overflow-hidden border-r border-neutral-200 bg-neutral-50 px-[18px] py-7 flex flex-col max-[1100px]:static max-[1100px]:h-auto max-[1100px]:max-h-none">
-      <div className="shrink-0 h-[84px] flex items-center gap-3.5 px-2.5 pb-6 border-b border-neutral-200">
+      <div className="shrink-0 h-[64px] flex items-center gap-3.5 px-2.5 pb-6 border-b border-neutral-200">
         <div className="w-[44px] h-[44px] rounded-[17px] grid place-items-center text-white text-[26px] bg-gradient-to-br from-blue-600 to-violet-600">
           ▤
         </div>
